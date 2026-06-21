@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# DuroFiles
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DuroFiles is a comprehensive full-stack web application designed for generating, managing, and exporting professional PDF invoices. It features a modern, real-time A4 preview interface and a scalable architecture.
 
-Currently, two official plugins are available:
+## 🏗️ Architecture
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The project is split into two dedicated environments to ensure a clear separation of concerns:
 
-## React Compiler
+- **/frontend** - A robust **Next.js** web application built with React, Tailwind CSS, and TypeScript. It utilizes Client-Side Rendering (CSR) and Browser `localStorage` to securely manage invoice data and handle native print-to-PDF generation.
+- **/backend** - A high-performance **FastAPI (Python)** server connected to a **PostgreSQL** database via SQLAlchemy. This backend provides a scalable foundation for advanced file operations, user accounts, and remote data synchronization.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Getting Started
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Start the Frontend
+The frontend is a standard Next.js application.
+```bash
+cd frontend
+npm install
+npm run dev
 ```
+Navigate to `http://localhost:3000` to access the application.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Start the Backend
+The backend requires a local PostgreSQL server.
+```bash
+cd backend
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+# Create a virtual environment
+python -m venv venv
+.\venv\Scripts\activate  # On Windows
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure your database
+# Create a .env file in the backend/ directory with:
+# DATABASE_URL=postgresql://postgres:your_password@localhost:5432/durofiles
+
+# Run the FastAPI server
+uvicorn main:app --port 8000
 ```
+Navigate to `http://localhost:8000/docs` to view the API documentation.
+
+## ✨ Features
+
+- **Multi-Template Engine:** Instantly switch between Modern, Classic, and Creative invoice designs.
+- **Real-Time A4 Preview:** See exactly what your PDF will look like before you export it.
+- **Perfect PDF Generation:** Robust `@media print` CSS rules ensure your invoices are generated perfectly without any cutoffs or scrollbars.
+- **Local Storage Persistence:** Create, edit, and manage multiple invoices from a unified dashboard safely in your browser.
+- **Enterprise-Ready Backend:** A pristine FastAPI and PostgreSQL architecture ready for cloud deployment.
