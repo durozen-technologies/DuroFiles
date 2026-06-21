@@ -1,16 +1,16 @@
-# DuroFiles (InvoiceWebApp) Data Models
+# DuroFiles Data Models
 
-## Core Data Structures
+## Frontend Data Structures (Local Storage)
 
-The application relies on a strictly typed `InvoiceData` structure to ensure the form and preview stay perfectly synced. Data is persisted in the browser via `localStorage`.
+The frontend application relies on a strictly typed `InvoiceData` structure persisted in the browser via `localStorage`.
 
 ### `InvoiceData` Interface
-Located in `src/types/invoice.ts`.
+Located in `frontend/src/types/invoice.ts`.
 
 ```typescript
 export interface InvoiceData {
   id: string; // Unique UUID for dashboard tracking
-  templateId: 'modern' | 'classic' | 'creative'; // Controls which template renders the invoice
+  templateId: 'modern' | 'classic' | 'creative'; 
   invoiceNumber: string;
   date: string;
   dueDate: string;
@@ -49,10 +49,19 @@ export interface LineItem {
 }
 ```
 
-## Local Storage Persistence
-Data is saved under the `invoices_db` key in `localStorage` as an array of `InvoiceData` objects. 
-Helper functions are located in `src/utils/storage.ts`:
-- `getAllInvoices()`: Returns `InvoiceData[]`
-- `getInvoice(id)`: Returns specific `InvoiceData`
-- `saveInvoice(data)`: Upserts an invoice.
-- `deleteInvoice(id)`: Removes an invoice from storage.
+## Backend Database Schema (PostgreSQL)
+
+The backend utilizes SQLAlchemy ORM models connected to a PostgreSQL database to manage persistent storage across sessions.
+
+### Current Models
+Located in `backend/models.py`.
+
+*(Currently initialized with a blank slate `Base` schema, ready for future data models like Users, Remote Invoices, or heavy computation job tracking).*
+
+```python
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.sql import func
+from database import Base
+
+# Add your database models here
+```

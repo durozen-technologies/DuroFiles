@@ -1,42 +1,41 @@
-# DuroFiles (InvoiceWebApp) Architecture
+# DuroFiles Architecture
 
 ## High-Level Overview
-DuroFiles is a client-side Next.js web application designed to generate, manage, and export professional PDF invoices. It uses React state for real-time previewing and relies on browser `localStorage` for data persistence, ensuring maximum privacy and eliminating the need for a backend database.
+DuroFiles is a full-stack web application designed to generate, manage, and export professional PDF invoices, with a modular architecture prepared for future advanced file operations. It separates the frontend and backend into dedicated subdirectories.
+
+The frontend is a client-side Next.js web application using React state for real-time previewing and relying on browser `localStorage` for invoice data persistence (ensuring privacy).
+
+The backend is a high-performance Python FastAPI server connected to a PostgreSQL database, built to handle heavy processing tasks and persistent data models outside of the browser context.
 
 ## Directory Structure
 ```
-src/
-├── app/
-│   ├── layout.tsx         # Global layout (Header, Footer, CSS imports)
-│   ├── page.tsx           # Landing Page (iLovePDF-style design)
-│   ├── dashboard/page.tsx # Invoice Management Dashboard
-│   ├── invoice/[id]/page.tsx # Dynamic Route for the Invoice Editor
-│   └── globals.css        # Global styles and A4 Print specifics
-├── components/
-│   ├── Header.tsx         # Context-aware global navigation bar
-│   ├── Footer.tsx         # Global footer
-│   ├── InvoiceForm.tsx    # Left-side editor controls
-│   ├── InvoicePreview.tsx # Right-side live preview wrapper
-│   └── templates/         # Individual design templates
-│       ├── TemplateModern.tsx
-│       ├── TemplateClassic.tsx
-│       └── TemplateCreative.tsx
-├── types/
-│   └── invoice.ts         # TypeScript interfaces
-└── utils/
-    └── storage.ts         # localStorage CRUD operations
+DuroFiles/
+├── frontend/              # Next.js Application
+│   ├── src/
+│   │   ├── app/           # Next.js App Router (Dashboard, Invoices)
+│   │   ├── components/    # Reusable React components & Templates
+│   │   ├── types/         # TypeScript interfaces
+│   │   └── utils/         # localStorage CRUD operations
+│   └── ...
+├── backend/               # FastAPI Application
+│   ├── main.py            # API entry point & Routing
+│   ├── database.py        # PostgreSQL Connection Engine & Session
+│   ├── models.py          # SQLAlchemy ORM Models
+│   ├── .env               # Database credentials (PostgreSQL)
+│   └── requirements.txt   # Python Dependencies
+└── .core/                 # Project documentation and rules
 ```
 
 ## Key Architectural Decisions
 
-1. **Client-Side Rendering (CSR):**
-   The entire application heavily relies on `"use client"` directives since it manipulates browser state, handles window printing, and accesses `localStorage`. 
+1. **Strict Frontend/Backend Separation:**
+   The project is split into `/frontend` (Node/React) and `/backend` (Python/FastAPI) to ensure clear separation of concerns, allowing the backend to scale independently and run computationally heavy Python libraries if needed.
 
-2. **Template Engine Pattern:**
-   The `InvoicePreview.tsx` acts as a wrapper/router. It reads `data.templateId` and dynamically renders `TemplateModern`, `TemplateClassic`, or `TemplateCreative`. This allows for limitless future designs without cluttering a single file.
+2. **Client-Side Rendering (CSR) for Invoices:**
+   The frontend invoice generator heavily relies on `"use client"` directives to manipulate browser state and handle window printing natively via strict `@media print` CSS rules.
 
-3. **Print-to-PDF CSS:**
-   PDF generation is handled natively via the browser's `window.print()` API. This is powered by strict CSS `@media print` rules in `globals.css`. Elements with the `.print-hidden` class (like the sidebar, navbar, and buttons) are stripped away, and the `.a4-paper` class is forced to scale perfectly to the physical boundaries of an A4 sheet.
+3. **FastAPI & PostgreSQL Backend:**
+   The backend uses FastAPI for rapid endpoint development and SQLAlchemy as an ORM connected to PostgreSQL (`psycopg2-binary`). The `.env` file enforces a strict PostgreSQL connection string, ensuring production-grade database capabilities.
 
-4. **Context-Aware Global Layout:**
-   `layout.tsx` wraps the entire app in a flexbox container with a global `<Header />` and `<Footer />`. The `Header` uses `next/navigation` (`usePathname()`) to conditionally display links based on whether the user is on the Landing Page, Dashboard, or inside the Editor.
+4. **Template Engine Pattern:**
+   `InvoicePreview.tsx` acts as a wrapper/router to dynamically render different design templates (`TemplateModern`, `TemplateClassic`, etc.) without cluttering the main component.
