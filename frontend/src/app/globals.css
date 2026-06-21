@@ -1,0 +1,417 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #6366f1;
+  --primary-hover: #4f46e5;
+  --bg-color: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --danger-color: #ef4444;
+  --danger-hover: #dc2626;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App Layout */
+.app-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 450px;
+  background: white;
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  z-index: 10;
+}
+
+.preview-container {
+  flex: 1;
+  background-color: #f1f5f9;
+  padding: 80px 40px 40px 40px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Premium Form Styling */
+.form-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+.form-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 16px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.form-control {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background-color: white;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.form-control:hover:not(:focus) {
+  border-color: var(--border-hover);
+}
+
+.btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+}
+.btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.btn:active {
+  transform: translateY(0);
+}
+.btn-secondary {
+  background: white;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+.btn-secondary:hover {
+  background: #f1f5f9;
+  border-color: var(--border-hover);
+}
+.btn-danger {
+  background: var(--danger-color);
+}
+.btn-danger:hover {
+  background: var(--danger-hover);
+}
+
+/* A4 Paper Styling for Preview */
+.a4-paper {
+  background: white;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 20mm;
+  box-sizing: border-box;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  position: relative;
+  border-radius: 4px;
+  color: black;
+  overflow: hidden;
+}
+
+/* Draggable Canva Blocks */
+.draggable-block.editable:hover {
+  border-color: var(--primary-color) !important;
+  background-color: rgba(99, 102, 241, 0.03);
+  border-radius: 4px;
+}
+.draggable-block.editable:active {
+  background-color: rgba(99, 102, 241, 0.06);
+}
+
+/* Invoice Specific Styles inside A4 */
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.invoice-title {
+  font-size: 2.5rem;
+  font-weight: 500;
+  color: #6a48a9; /* Purple */
+  margin-bottom: 24px;
+}
+
+.invoice-meta-grid {
+  display: grid;
+  grid-template-columns: 100px auto;
+  gap: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+.meta-label {
+  color: var(--text-muted);
+}
+.meta-value {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.logo-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 1.25rem;
+  margin-top: 10px;
+}
+
+.logo-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: white;
+  font-weight: 700;
+}
+.logo-d { background: #e11d48; z-index: 7; }
+.logo-u { background: #facc15; margin-left: -8px; z-index: 6; }
+.logo-r { background: #facc15; margin-left: -8px; z-index: 5; }
+.logo-o { background: #4ade80; margin-left: -8px; z-index: 4; }
+.logo-z { background: #4ade80; margin-left: -8px; z-index: 3; }
+.logo-e { background: #2563eb; margin-left: -8px; z-index: 2; }
+.logo-n { background: #2563eb; margin-left: -8px; z-index: 1; }
+
+.billed-sections {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.billed-box {
+  flex: 1;
+  background-color: #f3e8ff; /* Light purple */
+  padding: 16px;
+  border-radius: 6px;
+}
+
+.billed-title {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #6a48a9;
+  margin-bottom: 8px;
+}
+
+.country-supply {
+  margin-bottom: 16px;
+  margin-left: 20px;
+  font-size: 0.875rem;
+}
+
+.invoice-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.invoice-text-bold {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.invoice-text-main {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 40px;
+}
+
+.invoice-table th, .invoice-table td {
+  padding: 12px;
+  text-align: left;
+  font-size: 0.875rem;
+  border: none; /* remove borders */
+}
+
+.invoice-table th {
+  background-color: #6a48a9;
+  color: white;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.invoice-table tbody tr:nth-child(even) {
+  background-color: #faf5ff; /* alternate rows */
+}
+.invoice-table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.invoice-bottom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.payment-info {
+  display: flex;
+  flex-direction: column;
+}
+.payment-title {
+  color: #6a48a9;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+.payment-desc {
+  font-size: 0.75rem;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.qr-code-box {
+  margin-bottom: 8px;
+}
+
+.upi-id {
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+.invoice-totals {
+  width: 300px;
+  margin-right: 20px;
+}
+
+.totals-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+.totals-row.grand-total {
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-top: 2px solid var(--text-main);
+  border-bottom: 2px solid var(--text-main);
+  padding-top: 12px;
+  padding-bottom: 12px;
+  margin-top: 4px;
+}
+
+.invoice-footer-note {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-main);
+  margin-top: 60px;
+}
+
+/* Print Styles */
+@media print {
+  @page {
+    size: auto;
+    margin: 0mm;
+  }
+  
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: white !important;
+  }
+  
+  .print-hidden {
+    display: none !important;
+  }
+
+  /* Make sure borders don't show up in print for editable blocks */
+  .draggable-block.editable {
+    border: none !important;
+    background: transparent !important;
+  }
+  
+  .app-container {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .sidebar {
+    display: none !important;
+  }
+  .preview-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block;
+    width: 210mm;
+    height: 297mm;
+  }
+  .a4-paper {
+    box-shadow: none;
+    margin: 0;
+    padding: 20mm; 
+    border-radius: 0;
+    width: 210mm;
+    min-height: 297mm;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .print-hidden {
+    display: none !important;
+  }
+}
+
+/* Draggable Block Hover State */
+.draggable-block.editable {
+  transition: all 0.2s ease;
+}
+
+.draggable-block.editable:hover {
+  border: 1px dashed #94a3b8 !important;
+  background-color: rgba(241, 245, 249, 0.4) !important;
+  border-radius: 4px;
+}
