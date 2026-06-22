@@ -1,5 +1,0 @@
-[build]
-providers = ["nodejs"]
-
-[build.variables]
-NIXPACKS_NODE_VERSION = "20"
