@@ -16,7 +16,7 @@ COPY . .
 RUN bun run build
 
 # Production stage
-FROM oven/bun:1.1-alpine AS runner
+FROM node:20.9.0-alpine AS runner
 
 WORKDIR /app
 
@@ -43,5 +43,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Start the application using Bun
-CMD ["bun", "server.js"]
+# Start the application using Node (which Next.js Standalone prefers)
+CMD ["node", "server.js"]
