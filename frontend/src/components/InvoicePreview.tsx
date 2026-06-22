@@ -5,6 +5,8 @@ import { TemplateClassic } from './templates/TemplateClassic';
 import { TemplateCreative } from './templates/TemplateCreative';
 import { TemplateTech } from './templates/TemplateTech';
 import { TemplateGSTStandard } from './templates/TemplateGSTStandard';
+import { TemplateAmazon } from './templates/TemplateAmazon';
+import { TemplateInstagram } from './templates/TemplateInstagram';
 
 interface Props {
   data: InvoiceData;
@@ -20,6 +22,10 @@ export const InvoicePreview: React.FC<Props> = ({ data, onChange }) => {
         return <TemplateCreative data={data} onChange={onChange} />;
       case 'tech':
         return <TemplateTech data={data} onChange={onChange} />;
+      case 'instagram_style':
+        return <TemplateInstagram data={data} onChange={onChange} />;
+      case 'amazon_style':
+        return <TemplateAmazon data={data} onChange={onChange} />;
       case 'gst_standard':
         return <TemplateGSTStandard data={data} onChange={onChange} />;
       case 'modern':

@@ -106,6 +106,8 @@ export const InvoiceForm: React.FC<Props> = ({ data, onChange }) => {
               <option value="creative">Creative (Bold)</option>
               <option value="tech">Tech (Green/Purple)</option>
               <option value="gst_standard">Standard GST</option>
+              <option value="amazon_style">Amazon Style</option>
+              <option value="instagram_style">Instagram Style</option>
             </select>
           </div>
           <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
