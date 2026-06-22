@@ -1,37 +1,47 @@
 # Build stage
-FROM node:20.9.0-alpine AS builder
+FROM oven/bun:1.1-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies using bun (much faster than npm ci)
+RUN bun install
 
 # Copy source code
 COPY . .
 
 # Build the Next.js application
-RUN npm run build
+RUN bun run build
 
 # Production stage
-FROM node:20.9.0-alpine
+FROM oven/bun:1.1-alpine AS runner
 
 WORKDIR /app
 
-# Copy package files from builder
-COPY package*.json ./
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install production dependencies only
-RUN npm ci --omit=dev
+# Create a non-root user for security
+RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 
-# Copy built application from builder
-COPY --from=builder /app/.next ./.next
+# Set correct permissions
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Copy standalone built application from builder
 COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 
 # Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "run", "start"]
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Start the application using Bun
+CMD ["bun", "server.js"]
