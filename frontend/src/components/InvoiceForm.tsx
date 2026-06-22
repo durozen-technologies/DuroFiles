@@ -199,7 +199,7 @@ export const InvoiceForm: React.FC<Props> = ({ data, onChange }) => {
           <div key={item.id} style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #e5e7eb' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
               <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>Item {index + 1}</span>
-              <button onClick={() => removeItem(index)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
+              <button onClick={() => removeItem(index)} style={{ background: 'none', border: 'none', color: 'var(--danger-color)', cursor: 'pointer' }}><Trash2 size={16} /></button>
             </div>
             
             <div className="form-group">

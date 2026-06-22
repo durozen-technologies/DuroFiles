@@ -27,7 +27,7 @@ export default function Home() {
             Fast, secure, and professional invoicing platform for freelancers and businesses. Completely free to use.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button onClick={() => router.push('/dashboard')} style={{ background: '#ef4444', color: 'white', padding: '16px 32px', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px rgb(239 68 68 / 0.4)' }}>
+            <button onClick={() => router.push('/dashboard')} style={{ background: 'var(--primary-color)', color: 'white', padding: '16px 32px', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px var(--primary-color)' }}>
               Create Invoice <ChevronRight size={20} />
             </button>
             <button onClick={() => router.push('/templates')} style={{ background: 'white', color: '#0f172a', padding: '16px 32px', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 600, border: '1px solid #cbd5e1', cursor: 'pointer', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }}>

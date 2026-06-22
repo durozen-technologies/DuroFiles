@@ -1,15 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #6366f1;
-  --primary-hover: #4f46e5;
+  --brand-navy: #1a2e44;
+  --brand-blue: #125bc6;
+  --brand-red: #e71a1e;
+  --brand-green: #42bc36;
+  --brand-yellow: #fed204;
+
+  --primary-color: var(--brand-blue);
+  --primary-hover: #0f4ba3;
   --bg-color: #f8fafc;
-  --text-main: #0f172a;
+  --text-main: var(--brand-navy);
   --text-muted: #64748b;
   --border-color: #e2e8f0;
   --border-hover: #cbd5e1;
-  --danger-color: #ef4444;
-  --danger-hover: #dc2626;
+  --danger-color: var(--brand-red);
+  --danger-hover: #c41318;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);

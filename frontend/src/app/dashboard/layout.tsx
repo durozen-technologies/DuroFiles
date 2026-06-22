@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { LayoutDashboard, FileText, Users, Package, Settings, Trash2, Plus } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -10,7 +11,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleCreateNew = () => {
     const newInvoice = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       templateId: 'modern' as const,
       invoiceNumber: `INV-${Math.floor(Math.random() * 10000)}`,
       date: new Date().toISOString().split('T')[0],
@@ -19,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       currency: '₹',
       billedBy: { name: '', address: '', gstin: '', pan: '', email: '', phone: '' },
       billedTo: { name: '', address: '', gstin: '', pan: '' },
-      items: [{ id: crypto.randomUUID(), description: 'Sample Item', hsn: '', gstRate: 18, quantity: 1, rate: 1000 }],
+      items: [{ id: uuidv4(), description: 'Sample Item', hsn: '', gstRate: 18, quantity: 1, rate: 1000 }],
       paymentDetails: { upiId: '' }
     };
     const saved = localStorage.getItem('invoices_db');
@@ -54,7 +55,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Sidebar Navigation */}
         <aside style={{ width: '260px', padding: '30px 20px', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           
-          <button onClick={handleCreateNew} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
+          <button onClick={handleCreateNew} style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
             <Plus size={18} /> New Invoice
           </button>
 

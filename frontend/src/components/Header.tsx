@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { FileText, Printer, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Printer, ArrowLeft, RefreshCw } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const router = useRouter();
@@ -21,8 +21,8 @@ export const Header: React.FC = () => {
       {/* Left: Logo or Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => router.push('/')}>
-          <div style={{ display: 'flex', alignItems: 'center', fontSize: '1.4rem', fontWeight: 900, color: '#111' }}>
-            <FileText size={24} color="#ef4444" style={{ marginRight: '8px' }} /> DuroFiles
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/logo.png" alt="DuroFiles Logo" style={{ height: '125px' }} />
           </div>
         </div>
 

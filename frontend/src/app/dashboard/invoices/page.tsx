@@ -139,7 +139,7 @@ export default function Dashboard() {
                       <td style={{ padding: '16px', textAlign: 'center' }}>
                         <button 
                           onClick={(e) => handleDelete(inv.id, e)}
-                          style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px' }}
+                          style={{ background: 'none', border: 'none', color: 'var(--danger-color)', cursor: 'pointer', padding: '8px' }}
                           title="Delete Invoice"
                         >
                           <Trash2 size={18} />
