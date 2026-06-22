@@ -10,7 +10,7 @@ export interface LineItem {
 
 export interface InvoiceData {
   id: string;
-  templateId: 'modern' | 'classic' | 'creative' | 'tech';
+  templateId: 'modern' | 'classic' | 'creative' | 'tech' | 'gst_standard';
   invoiceNumber: string;
   date: string;
   dueDate: string;

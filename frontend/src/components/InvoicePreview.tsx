@@ -4,6 +4,7 @@ import { TemplateModern } from './templates/TemplateModern';
 import { TemplateClassic } from './templates/TemplateClassic';
 import { TemplateCreative } from './templates/TemplateCreative';
 import { TemplateTech } from './templates/TemplateTech';
+import { TemplateGSTStandard } from './templates/TemplateGSTStandard';
 
 interface Props {
   data: InvoiceData;
@@ -19,6 +20,8 @@ export const InvoicePreview: React.FC<Props> = ({ data, onChange }) => {
         return <TemplateCreative data={data} onChange={onChange} />;
       case 'tech':
         return <TemplateTech data={data} onChange={onChange} />;
+      case 'gst_standard':
+        return <TemplateGSTStandard data={data} onChange={onChange} />;
       case 'modern':
       default:
         return <TemplateModern data={data} onChange={onChange} />;
