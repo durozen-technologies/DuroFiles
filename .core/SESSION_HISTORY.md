@@ -24,3 +24,14 @@
 4. **Tool Experimentation (PDF-to-Word):** Temporarily built, tested, and subsequently removed a heavy PDF conversion feature (LayoutLMv3 AI, LibreOffice Headless, pdf2docx) per user request to maintain project agility.
 5. **Codebase Cleanup:** Conducted a comprehensive sweep to delete all test artifacts (`uploads/`, `outputs/`, `__pycache__`, stale databases) ensuring a 100% clean repository.
 6. **Git Initialization:** Created a custom `.gitignore`, committed the clean architecture, and successfully pushed the master branch to GitHub (`durozen-technologies/DuroFiles`).
+
+---
+
+## Session 3: Core Invoice Enhancements & Payment Integrations
+**Date:** June 23, 2026
+
+**Goals Achieved:**
+1. **Settings Menu Expansion:** Added Toggle Visibility support for `UPI QR Code` and `Bank Details`.
+2. **Template Expansion:** Integrated `UPI QR Code` and editable `Bank Details` components into all 7 invoice templates (Modern, Classic, Creative, Tech, GST Standard, Amazon, Instagram).
+3. **Data Model Fix:** Fixed a TypeScript interface error by promoting `upiId` to the root `InvoiceData` payload structure.
+4. **Layout Normalization:** Unified Flexbox and CSS Grid alignments across all invoice footers ensuring consistent padding and layout for the new components.
