@@ -1,6 +1,9 @@
 import React from 'react';
 import type { InvoiceData } from '../../types/invoice';
 import { DraggableBlock } from '../DraggableBlock';
+import { EditableLabel } from '../EditableLabel';
+import { EditableValue } from '../EditableValue';
+import { EditableImage } from '../EditableImage';
 
 interface Props {
   data: InvoiceData;
@@ -33,31 +36,37 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
         <DraggableBlock id="header_left" data={data} onChange={onChange}>
           <div>
-            {data.logoUrl && (
-              <img src={data.logoUrl} alt="Company Logo" style={{ maxHeight: '80px', maxWidth: '200px', objectFit: 'contain', marginBottom: '16px' }} />
+            {!data.hiddenFields?.includes('logo') && (
+              <EditableImage src={data.logoUrl || ''} onChange={(v) => onChange?.({ ...data, logoUrl: v })} style={{ maxHeight: '80px', maxWidth: '200px', objectFit: 'contain', marginBottom: '16px' }} />
             )}
-            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '4px' }}>{data.billedBy.name || 'Your Company'}</div>
-            <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.85rem', color: '#555' }}>{data.billedBy.address || 'Company Address'}</div>
-            {data.billedBy.gstin && <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}><strong>GSTIN:</strong> {data.billedBy.gstin}</div>}
-            {data.billedBy.pan && <div style={{ fontSize: '0.85rem', color: '#555' }}><strong>PAN:</strong> {data.billedBy.pan}</div>}
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '4px' }}><EditableValue value={data.billedBy.name} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, name: v } })} placeholder="Your Company Name" /></div>
+            <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.85rem', color: '#555' }}><EditableValue isTextArea value={data.billedBy.address} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, address: v } })} placeholder="Your Address" /></div>
+            {data.billedBy.gstin && !data.hiddenFields?.includes('gstin') && <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}><strong>GSTIN:</strong> <EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, gstin: v } })} placeholder="GSTIN" /></div>}
+            {data.billedBy.pan && <div style={{ fontSize: '0.85rem', color: '#555' }}><strong>PAN:</strong> <EditableValue value={data.billedBy.pan} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, pan: v } })} placeholder="PAN" /></div>}
           </div>
         </DraggableBlock>
-        
+
         <DraggableBlock id="header_right" data={data} onChange={onChange}>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '2rem', color: '#333', letterSpacing: '2px', marginBottom: '16px' }}>TAX INVOICE</div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', fontSize: '0.85rem', marginBottom: '6px' }}>
-              <span style={{ color: '#555' }}>Invoice#</span>
-              <strong style={{ minWidth: '100px', textAlign: 'left' }}>{data.invoiceNumber || 'INV-12'}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', fontSize: '0.85rem', marginBottom: '6px' }}>
-              <span style={{ color: '#555' }}>Invoice Date</span>
-              <strong style={{ minWidth: '100px', textAlign: 'left' }}>{data.date}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', fontSize: '0.85rem' }}>
-              <span style={{ color: '#555' }}>Due Date</span>
-              <strong style={{ minWidth: '100px', textAlign: 'left' }}>{data.dueDate}</strong>
-            </div>
+            <div style={{ fontSize: '2rem', color: '#333', letterSpacing: '2px', marginBottom: '16px' }}><EditableLabel id="lbl_invoice" defaultText="TAX INVOICE" data={data} onChange={onChange} /></div>
+            {!data.hiddenFields?.includes('invoiceNo') && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', fontSize: '0.85rem', marginBottom: '6px' }}>
+                <span style={{ color: '#555' }}>Invoice#</span>
+                <strong style={{ minWidth: '100px', textAlign: 'left' }}><EditableValue value={data.invoiceNumber} onChange={(v) => onChange?.({ ...data, invoiceNumber: v })} placeholder="INV-001" /></strong>
+              </div>
+            )}
+            {!data.hiddenFields?.includes('invoiceDate') && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', fontSize: '0.85rem', marginBottom: '6px' }}>
+                <span style={{ color: '#555' }}>Invoice Date</span>
+                <strong style={{ minWidth: '100px', textAlign: 'left' }}><EditableValue value={data.date} onChange={(v) => onChange?.({ ...data, date: v })} placeholder="Date" /></strong>
+              </div>
+            )}
+            {!data.hiddenFields?.includes('dueDate') && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', fontSize: '0.85rem' }}>
+                <span style={{ color: '#555' }}>Due Date</span>
+                <strong style={{ minWidth: '100px', textAlign: 'left' }}><EditableValue value={data.dueDate} onChange={(v) => onChange?.({ ...data, dueDate: v })} placeholder="Due Date" /></strong>
+              </div>
+            )}
           </div>
         </DraggableBlock>
       </div>
@@ -67,16 +76,16 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
         <DraggableBlock id="bill_to" data={data} onChange={onChange}>
           <div style={{ marginBottom: '16px' }}>
             <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: '4px' }}>Bill To:</div>
-            <div style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>{data.billedTo.name || 'Client Company'}</div>
-            {data.billedTo.gstin && <div style={{ fontSize: '0.85rem', color: '#555' }}><strong>GSTIN:</strong> {data.billedTo.gstin}</div>}
-            <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.85rem', color: '#555', marginTop: '2px' }}>{data.billedTo.address || 'Client Address'}</div>
+            <div style={{ fontWeight: 'bold', fontSize: '0.95rem' }}><EditableValue value={data.billedTo.name} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, name: v } })} placeholder="Client Name" /></div>
+            {data.billedTo.gstin && !data.hiddenFields?.includes('customerGst') && <div style={{ fontSize: '0.85rem', color: '#555' }}><strong>GSTIN:</strong> <EditableValue value={data.billedTo.gstin} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, gstin: v } })} placeholder="GSTIN" /></div>}
+            <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.85rem', color: '#555', marginTop: '2px' }}><EditableValue isTextArea value={data.billedTo.address} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, address: v } })} placeholder="Client Address" /></div>
           </div>
         </DraggableBlock>
 
-        {data.countryOfSupply && (
+        {data.countryOfSupply && !data.hiddenFields?.includes('placeOfSupply') && (
           <DraggableBlock id="place_of_supply" data={data} onChange={onChange}>
             <div style={{ fontSize: '0.85rem' }}>
-              <strong>Place Of Supply:</strong> {data.countryOfSupply}
+              <strong>Place Of Supply:</strong> <EditableValue value={data.countryOfSupply} onChange={(v) => onChange?.({ ...data, countryOfSupply: v })} placeholder="Country" />
             </div>
           </DraggableBlock>
         )}
@@ -89,64 +98,83 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
             <tr style={{ backgroundColor: '#000', color: '#fff', fontSize: '0.75rem', textAlign: 'left' }}>
               <th style={{ padding: '10px' }}>#</th>
               <th style={{ padding: '10px' }}>Item Description</th>
-              <th style={{ padding: '10px', textAlign: 'center' }}>HSN/SAC</th>
-              <th style={{ padding: '10px', textAlign: 'center' }}>Qty</th>
-              <th style={{ padding: '10px', textAlign: 'right' }}>Rate</th>
+              {!data.hiddenFields?.includes('hsn') && <th style={{ padding: '10px', textAlign: 'center' }}>HSN/SAC</th>}
+              <th style={{ padding: '10px', textAlign: 'center' }}><EditableLabel id="lbl_col_qty" defaultText="Qty" data={data} onChange={onChange} /></th>
+              <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_rate" defaultText="Rate" data={data} onChange={onChange} /></th>
               {isIGST ? (
-                <th style={{ padding: '10px', textAlign: 'right' }}>IGST</th>
+                <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_igst" defaultText="IGST" data={data} onChange={onChange} /></th>
               ) : (
                 <>
-                  <th style={{ padding: '10px', textAlign: 'right' }}>SGST</th>
-                  <th style={{ padding: '10px', textAlign: 'right' }}>CGST</th>
+                  <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_sgst" defaultText="SGST" data={data} onChange={onChange} /></th>
+                  <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_cgst" defaultText="CGST" data={data} onChange={onChange} /></th>
                 </>
               )}
               <th style={{ padding: '10px', textAlign: 'right' }}>Cess</th>
-              <th style={{ padding: '10px', textAlign: 'right' }}>Amount</th>
+              <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_amt" defaultText="Amount" data={data} onChange={onChange} /></th>
             </tr>
           </thead>
           <tbody>
             {data.items.length === 0 && (
-               <tr>
-                 <td colSpan={isIGST ? 8 : 9} style={{ textAlign: 'center', color: '#9ca3af', padding: '20px' }}>No items added yet</td>
-               </tr>
+              <tr>
+                <td colSpan={isIGST ? 8 : 9} style={{ textAlign: 'center', color: '#9ca3af', padding: '20px' }}>No items added yet</td>
+              </tr>
             )}
             {data.items.map((item, index) => {
               const amount = item.quantity * item.rate;
               const taxAmount = amount * ((item.gstRate || 0) / 100);
-              
+
               return (
-                <tr key={item.id || index} style={{ borderBottom: '1px solid #eee', fontSize: '0.8rem' }}>
-                  <td style={{ padding: '12px 10px', verticalAlign: 'top' }}>{index + 1}</td>
+                <tr key={item.id || index} style={{ borderBottom: '1px solid #eee', fontSize: '0.8rem' }} className="invoice-row-group">
                   <td style={{ padding: '12px 10px', verticalAlign: 'top' }}>
-                    <div style={{ fontWeight: 'bold', color: '#333' }}>{item.description || 'Item Name'}</div>
+                    {onChange && (
+                      <button className="delete-item-btn print-hidden" onClick={() => { const newItems = [...data.items]; newItems.splice(index, 1); onChange({ ...data, items: newItems }); }} style={{ marginRight: '4px' }}>×</button>
+                    )}
+                    {index + 1}
                   </td>
-                  <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'top' }}>{item.hsn}</td>
-                  <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'top' }}>{item.quantity}</td>
-                  <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>{item.rate.toFixed(2)}</td>
-                  
+                  <td style={{ padding: '12px 10px', verticalAlign: 'top' }}>
+                    <div style={{ fontWeight: 'bold', color: '#333' }}><EditableValue value={item.description} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, description: v }; onChange?.({ ...data, items: newItems }) }} placeholder="Item Name" /></div>
+                  </td>
+                  {!data.hiddenFields?.includes('hsn') && (
+                    <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'top' }}><EditableValue value={item.hsn} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, hsn: v }; onChange?.({ ...data, items: newItems }) }} placeholder="HSN" /></td>
+                  )}
+                  <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'top' }}><EditableValue value={item.quantity.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, quantity: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
+                  <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}><EditableValue value={item.rate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, rate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
+
                   {isIGST ? (
                     <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>
-                      {taxAmount.toFixed(2)}<br/>
-                      <span style={{ fontSize: '0.7rem', color: '#777' }}>{item.gstRate}%</span>
+                      {taxAmount.toFixed(2)}<br />
+                      <span style={{ fontSize: '0.7rem', color: '#777' }}><EditableValue value={item.gstRate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, gstRate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" />%</span>
                     </td>
                   ) : (
                     <>
                       <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>
-                        {(taxAmount / 2).toFixed(2)}<br/>
+                        {(taxAmount / 2).toFixed(2)}<br />
                         <span style={{ fontSize: '0.7rem', color: '#777' }}>{cgstSgstRateStr(item.gstRate)}</span>
                       </td>
                       <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>
-                        {(taxAmount / 2).toFixed(2)}<br/>
+                        {(taxAmount / 2).toFixed(2)}<br />
                         <span style={{ fontSize: '0.7rem', color: '#777' }}>{cgstSgstRateStr(item.gstRate)}</span>
                       </td>
                     </>
                   )}
-                  
+
                   <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>0.00</td>
-                  <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>{amount.toFixed(2)}</td>
+                  <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}><EditableValue value={amount.toFixed(2)} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
                 </tr>
               );
             })}
+            {onChange && (
+              <tr className="print-hidden">
+                <td colSpan={data.hiddenFields?.includes('hsn') ? (isIGST ? 7 : 8) : (isIGST ? 8 : 9)} style={{ textAlign: 'center', padding: '10px' }}>
+                  <button
+                    className="add-item-btn"
+                    onClick={() => onChange({ ...data, items: [...data.items, { id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }] })}
+                  >
+                    + Add Item
+                  </button>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </DraggableBlock>
@@ -160,7 +188,7 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
               <span style={{ color: '#555' }}>Sub Total</span>
               <strong style={{ minWidth: '100px', textAlign: 'right' }}>{subtotal.toFixed(2)}</strong>
             </div>
-            
+
             {isIGST ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.85rem' }}>
                 <span style={{ color: '#555' }}>IGST</span>
@@ -189,28 +217,30 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
 
       {/* Footer Notes & Terms */}
       <div>
-        {data.notes && (
+        {!data.hiddenFields?.includes('notes') && data.notes && (
           <DraggableBlock id="notes_section" data={data} onChange={onChange}>
             <div style={{ marginBottom: '20px' }}>
               <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: '4px' }}>Notes</div>
-              <div style={{ fontSize: '0.8rem', color: '#333', whiteSpace: 'pre-wrap' }}>{data.notes}</div>
+              <div style={{ fontSize: '0.8rem', color: '#333', whiteSpace: 'pre-wrap' }}><EditableValue isTextArea value={data.notes} onChange={(v) => onChange?.({ ...data, notes: v })} placeholder="Enter notes here..." /></div>
             </div>
           </DraggableBlock>
         )}
 
-        {data.terms && (
+        {!data.hiddenFields?.includes('terms') && data.terms && (
           <DraggableBlock id="terms_section" data={data} onChange={onChange}>
             <div>
               <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: '4px' }}>Terms & Conditions</div>
-              <div style={{ fontSize: '0.8rem', color: '#333', whiteSpace: 'pre-wrap' }}>{data.terms}</div>
+              <div style={{ fontSize: '0.8rem', color: '#333', whiteSpace: 'pre-wrap' }}><EditableValue isTextArea value={data.terms} onChange={(v) => onChange?.({ ...data, terms: v })} placeholder="Enter your terms and conditions here..." /></div>
             </div>
           </DraggableBlock>
         )}
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '60px', padding: '20px 0', borderTop: '1px solid #eee', fontSize: '0.75rem', color: '#777' }}>
-        Crafted with ease using <strong>DuroFiles</strong>
-      </div>
+      {!data.hiddenFields?.includes('signature') && (
+        <div style={{ textAlign: 'center', marginTop: '60px', padding: '20px 0', borderTop: '1px solid #eee', fontSize: '0.75rem', color: '#777' }}>
+          Crafted with ease using <strong>DuroFiles</strong>
+        </div>
+      )}
     </div>
   );
 };

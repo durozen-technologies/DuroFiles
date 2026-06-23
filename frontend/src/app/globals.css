@@ -49,7 +49,7 @@ body {
   border-right: 1px solid var(--border-color);
   overflow-y: auto;
   padding: 24px;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   z-index: 10;
 }
 
@@ -69,6 +69,7 @@ body {
   padding-bottom: 20px;
   border-bottom: 1px solid var(--border-color);
 }
+
 .form-section-title {
   font-size: 1.1rem;
   font-weight: 600;
@@ -79,6 +80,7 @@ body {
 .form-group {
   margin-bottom: 16px;
 }
+
 .form-group label {
   display: block;
   font-size: 0.875rem;
@@ -86,6 +88,7 @@ body {
   color: var(--text-main);
   margin-bottom: 6px;
 }
+
 .form-control {
   width: 100%;
   padding: 12px 14px;
@@ -98,11 +101,13 @@ body {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-sm);
 }
+
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
+
 .form-control:hover:not(:focus) {
   border-color: var(--border-hover);
 }
@@ -124,27 +129,33 @@ body {
   gap: 8px;
   box-shadow: var(--shadow-sm);
 }
+
 .btn:hover {
   background: var(--primary-hover);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
+
 .btn:active {
   transform: translateY(0);
 }
+
 .btn-secondary {
   background: white;
   color: var(--text-main);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
 }
+
 .btn-secondary:hover {
   background: #f1f5f9;
   border-color: var(--border-hover);
 }
+
 .btn-danger {
   background: var(--danger-color);
 }
+
 .btn-danger:hover {
   background: var(--danger-hover);
 }
@@ -156,7 +167,7 @@ body {
   min-height: 297mm;
   padding: 20mm;
   box-sizing: border-box;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   position: relative;
   border-radius: 4px;
   color: black;
@@ -169,6 +180,7 @@ body {
   background-color: rgba(99, 102, 241, 0.03);
   border-radius: 4px;
 }
+
 .draggable-block.editable:active {
   background-color: rgba(99, 102, 241, 0.06);
 }
@@ -183,7 +195,8 @@ body {
 .invoice-title {
   font-size: 2.5rem;
   font-weight: 500;
-  color: #6a48a9; /* Purple */
+  color: #6a48a9;
+  /* Purple */
   margin-bottom: 24px;
 }
 
@@ -194,9 +207,11 @@ body {
   font-size: 0.875rem;
   color: var(--text-muted);
 }
+
 .meta-label {
   color: var(--text-muted);
 }
+
 .meta-value {
   font-weight: 600;
   color: var(--text-main);
@@ -220,13 +235,47 @@ body {
   color: white;
   font-weight: 700;
 }
-.logo-d { background: #e11d48; z-index: 7; }
-.logo-u { background: #facc15; margin-left: -8px; z-index: 6; }
-.logo-r { background: #facc15; margin-left: -8px; z-index: 5; }
-.logo-o { background: #4ade80; margin-left: -8px; z-index: 4; }
-.logo-z { background: #4ade80; margin-left: -8px; z-index: 3; }
-.logo-e { background: #2563eb; margin-left: -8px; z-index: 2; }
-.logo-n { background: #2563eb; margin-left: -8px; z-index: 1; }
+
+.logo-d {
+  background: #e11d48;
+  z-index: 7;
+}
+
+.logo-u {
+  background: #facc15;
+  margin-left: -8px;
+  z-index: 6;
+}
+
+.logo-r {
+  background: #facc15;
+  margin-left: -8px;
+  z-index: 5;
+}
+
+.logo-o {
+  background: #4ade80;
+  margin-left: -8px;
+  z-index: 4;
+}
+
+.logo-z {
+  background: #4ade80;
+  margin-left: -8px;
+  z-index: 3;
+}
+
+.logo-e {
+  background: #2563eb;
+  margin-left: -8px;
+  z-index: 2;
+}
+
+.logo-n {
+  background: #2563eb;
+  margin-left: -8px;
+  z-index: 1;
+}
 
 .billed-sections {
   display: flex;
@@ -236,7 +285,8 @@ body {
 
 .billed-box {
   flex: 1;
-  background-color: #f3e8ff; /* Light purple */
+  background-color: #f3e8ff;
+  /* Light purple */
   padding: 16px;
   border-radius: 6px;
 }
@@ -258,10 +308,12 @@ body {
   font-size: 0.875rem;
   line-height: 1.5;
 }
+
 .invoice-text-bold {
   font-size: 0.875rem;
   font-weight: 600;
 }
+
 .invoice-text-main {
   font-size: 0.875rem;
   font-weight: 500;
@@ -273,11 +325,13 @@ body {
   margin-bottom: 40px;
 }
 
-.invoice-table th, .invoice-table td {
+.invoice-table th,
+.invoice-table td {
   padding: 12px;
   text-align: left;
   font-size: 0.875rem;
-  border: none; /* remove borders */
+  border: none;
+  /* remove borders */
 }
 
 .invoice-table th {
@@ -288,8 +342,10 @@ body {
 }
 
 .invoice-table tbody tr:nth-child(even) {
-  background-color: #faf5ff; /* alternate rows */
+  background-color: #faf5ff;
+  /* alternate rows */
 }
+
 .invoice-table tbody tr {
   border-bottom: 1px solid #f3f4f6;
 }
@@ -308,11 +364,13 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 .payment-title {
   color: #6a48a9;
   font-size: 0.9rem;
   margin-bottom: 8px;
 }
+
 .payment-desc {
   font-size: 0.75rem;
   color: var(--text-main);
@@ -341,6 +399,7 @@ body {
   font-size: 0.9rem;
   color: var(--text-main);
 }
+
 .totals-row.grand-total {
   font-size: 1.1rem;
   font-weight: 600;
@@ -364,13 +423,13 @@ body {
     size: auto;
     margin: 0mm;
   }
-  
+
   body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     background: white !important;
   }
-  
+
   .print-hidden {
     display: none !important;
   }
@@ -380,15 +439,17 @@ body {
     border: none !important;
     background: transparent !important;
   }
-  
+
   .app-container {
     display: block;
     height: auto;
     overflow: visible;
   }
+
   .sidebar {
     display: none !important;
   }
+
   .preview-container {
     padding: 0 !important;
     margin: 0 !important;
@@ -396,16 +457,18 @@ body {
     width: 210mm;
     height: 297mm;
   }
+
   .a4-paper {
     box-shadow: none;
     margin: 0;
-    padding: 20mm; 
+    padding: 20mm;
     border-radius: 0;
     width: 210mm;
     min-height: 297mm;
     box-sizing: border-box;
     overflow: hidden;
   }
+
   .print-hidden {
     display: none !important;
   }
@@ -420,4 +483,146 @@ body {
   border: 1px dashed #94a3b8 !important;
   background-color: rgba(241, 245, 249, 0.4) !important;
   border-radius: 4px;
+}
+
+/* Inline Table Editing Styles */
+.invoice-row-group {
+  position: relative;
+}
+
+.invoice-row-group .delete-item-btn {
+  opacity: 0;
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 10;
+}
+
+.invoice-row-group:hover .delete-item-btn {
+  opacity: 1;
+}
+
+.invoice-row-group .delete-item-btn:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: var(--danger-hover);
+}
+
+.add-item-btn {
+  background: transparent;
+  color: var(--primary-color);
+  border: 1px dashed var(--border-color);
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+  display: block;
+}
+
+.add-item-btn:hover {
+  background: var(--bg-color);
+  border-color: var(--primary-color);
+}
+
+/* Editable Text Fields - Hover and Focus Styles */
+.editable-field {
+  border-radius: 4px;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+  outline: none !important;
+}
+
+/* Only apply hover/focus if they are actually editable (cursor: text) */
+.editable-field[style*="cursor: text"]:hover {
+  box-shadow: 0 0 0 1px #cbd5e1;
+  background-color: rgba(248, 250, 252, 0.8);
+}
+
+.editable-field[style*="cursor: text"]:focus {
+  box-shadow: 0 0 0 2px #60a5fa !important;
+  background-color: #ffffff;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  .settings-toolbar {
+    width: 95vw !important;
+    gap: 10px !important;
+    padding: 10px 15px !important;
+    border-radius: 16px !important;
+    top: 80px !important;
+  }
+
+  .preview-container {
+    padding: 170px 0px 40px 0px !important;
+    /* Extra padding for the wrapped toolbar */
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    width: 100vw;
+  }
+
+  /* On mobile, keep the a4-paper its original width, and allow horizontal scrolling. 
+     This prevents the invoice content from squishing and breaking the layout. */
+  .a4-paper {
+    width: 210mm !important;
+    min-width: 210mm !important;
+    transform-origin: top left;
+    margin: 0 auto;
+  }
+
+  .invoice-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .invoice-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .invoice-header>div:last-child {
+    text-align: left !important;
+  }
+
+  .invoice-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .billed-sections {
+    flex-direction: column;
+  }
+
+  .invoice-bottom {
+    flex-direction: column;
+  }
+
+  .invoice-totals {
+    width: 100%;
+    margin-top: 24px;
+    margin-right: 0;
+  }
+
+  .invoice-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

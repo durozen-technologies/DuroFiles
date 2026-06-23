@@ -17,7 +17,7 @@ interface AccordionProps {
 
 const AccordionSection: React.FC<AccordionProps> = ({ title, isOpen, onToggle, children }) => (
   <div style={{ marginBottom: '16px', background: 'white', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-    <div 
+    <div
       onClick={onToggle}
       style={{ padding: '16px', background: isOpen ? 'var(--bg-color)' : 'white', borderBottom: isOpen ? '1px solid var(--border-color)' : 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 600, color: 'var(--text-main)', transition: 'background 0.2s' }}
     >
@@ -95,7 +95,7 @@ export const InvoiceForm: React.FC<Props> = ({ data, onChange }) => {
   return (
     <div style={{ paddingRight: '10px' }}>
       <h2 style={{ marginBottom: '24px', color: 'var(--text-main)' }}>Invoice Details</h2>
-      
+
       <AccordionSection title="General Info" isOpen={openSection === 'General Info'} onToggle={() => setOpenSection(openSection === 'General Info' ? '' : 'General Info')}>
         <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
           <div className="form-group" style={{ flex: 2, marginBottom: 0 }}>
@@ -204,14 +204,14 @@ export const InvoiceForm: React.FC<Props> = ({ data, onChange }) => {
               <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>Item {index + 1}</span>
               <button onClick={() => removeItem(index)} style={{ background: 'none', border: 'none', color: 'var(--danger-color)', cursor: 'pointer' }}><Trash2 size={16} /></button>
             </div>
-            
+
             <div className="form-group">
               <label>Description</label>
               <input type="text" className="form-control" value={item.description} onChange={e => updateItem(index, 'description', e.target.value)} />
             </div>
-            
+
             <div style={{ display: 'flex', gap: '10px' }}>
-               <div className="form-group" style={{ flex: 2 }}>
+              <div className="form-group" style={{ flex: 2 }}>
                 <label>HSN</label>
                 <input type="text" className="form-control" value={item.hsn} onChange={e => updateItem(index, 'hsn', e.target.value)} />
               </div>
@@ -241,9 +241,9 @@ export const InvoiceForm: React.FC<Props> = ({ data, onChange }) => {
       <AccordionSection title="Tax Settings" isOpen={openSection === 'Tax Settings'} onToggle={() => setOpenSection(openSection === 'Tax Settings' ? '' : 'Tax Settings')}>
         <div className="form-group">
           <label>GST Type</label>
-          <select 
-            className="form-control" 
-            value={data.taxSettings?.type || 'IGST'} 
+          <select
+            className="form-control"
+            value={data.taxSettings?.type || 'IGST'}
             onChange={e => handleChange('taxSettings', 'type', e.target.value)}
           >
             <option value="IGST">IGST (Inter-state)</option>
@@ -278,7 +278,7 @@ export const InvoiceForm: React.FC<Props> = ({ data, onChange }) => {
           <textarea className="form-control" rows={2} value={data.paymentDetails?.paymentTerms || ''} onChange={e => handleChange('paymentDetails', 'paymentTerms', e.target.value)} />
         </div>
       </AccordionSection>
-      
+
       <AccordionSection title="Extra Sections" isOpen={openSection === 'Extra Sections'} onToggle={() => setOpenSection(openSection === 'Extra Sections' ? '' : 'Extra Sections')}>
         <div className="form-group">
           <label>Notes</label>
@@ -287,6 +287,68 @@ export const InvoiceForm: React.FC<Props> = ({ data, onChange }) => {
         <div className="form-group">
           <label>Terms & Conditions</label>
           <textarea className="form-control" rows={2} value={data.terms || ''} onChange={e => handleSimpleChange('terms', e.target.value)} />
+        </div>
+      </AccordionSection>
+
+      <AccordionSection title="Visibility Settings" isOpen={openSection === 'Visibility Settings'} onToggle={() => setOpenSection(openSection === 'Visibility Settings' ? '' : 'Visibility Settings')}>
+        <div style={{ marginBottom: '20px' }}>
+          <button 
+            type="button"
+            onClick={() => setIsDragMode(!isDragMode)}
+            style={{ 
+              width: '100%',
+              padding: '12px 16px', 
+              borderRadius: '8px', 
+              border: `1px solid ${isDragMode ? 'var(--primary-color)' : 'var(--border-color)'}`, 
+              backgroundColor: isDragMode ? 'rgba(99, 102, 241, 0.1)' : 'white',
+              color: isDragMode ? 'var(--primary-color)' : 'var(--text-main)',
+              fontSize: '0.9rem', 
+              cursor: 'pointer',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Move size={18} />
+            {isDragMode ? 'Drag Position Enabled' : 'Enable Drag Position'}
+          </button>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px', textAlign: 'center' }}>
+            When enabled, you can drag elements directly on the preview.
+          </p>
+        </div>
+
+        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[
+              { id: 'logo', label: 'Show Company Logo' },
+              { id: 'gstin', label: 'Show GST Number' },
+              { id: 'hsn', label: 'Show HSN/SAC Code' },
+              { id: 'customerGst', label: 'Show Customer GST' },
+              { id: 'notes', label: 'Show Notes' },
+              { id: 'terms', label: 'Show Terms & Conditions' },
+              { id: 'signature', label: 'Show Signature' },
+              { id: 'bankDetails', label: 'Show Bank Details' },
+              { id: 'qrCode', label: 'Show Payment QR Code' },
+              { id: 'upiId', label: 'Show UPI ID' },
+              { id: 'dueDate', label: 'Show Due Date' },
+              { id: 'paymentStatus', label: 'Show Payment Status' },
+              { id: 'discount', label: 'Show Discount' },
+              { id: 'shippingCharges', label: 'Show Shipping Charges' },
+            ].map(section => (
+              <label key={section.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-main)', padding: '4px 0' }}>
+                <input 
+                  type="checkbox" 
+                  checked={!isHidden(section.id)} 
+                  onChange={() => toggleVisibility(section.id)}
+                  style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                />
+                {section.label}
+              </label>
+            ))}
+          </div>
         </div>
       </AccordionSection>
     </div>

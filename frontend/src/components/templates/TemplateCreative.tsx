@@ -2,6 +2,9 @@ import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { InvoiceData } from '../../types/invoice';
 import { DraggableBlock } from '../DraggableBlock';
+import { EditableLabel } from '../EditableLabel';
+import { EditableValue } from '../EditableValue';
+import { EditableImage } from '../EditableImage';
 
 interface Props {
   data: InvoiceData;
@@ -33,13 +36,15 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
         <div style={{ background: '#f97316', color: 'white', margin: '-20mm -20mm 20px -20mm', padding: '20mm', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <DraggableBlock id="header_title" data={data} onChange={onChange}><h1 style={{ fontSize: '3.5rem', fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>INVOICE</h1></DraggableBlock>
-            <DraggableBlock id="header_invNo" data={data} onChange={onChange}><p style={{ fontSize: '1.2rem', opacity: 0.9 }}>#{data.invoiceNumber || '001'}</p></DraggableBlock>
+            {!data.hiddenFields?.includes('invoiceNo') && (
+              <DraggableBlock id="header_invNo" data={data} onChange={onChange}><p style={{ fontSize: '1.2rem', opacity: 0.9 }}>#<EditableValue value={data.invoiceNumber} onChange={(v) => onChange?.({...data, invoiceNumber: v})} placeholder="INV-001" /></p></DraggableBlock>
+            )}
           </div>
           <div style={{ textAlign: 'right' }}>
             {data.logoUrl ? (
               <DraggableBlock id="header_logo" data={data} onChange={onChange}><img src={data.logoUrl} alt="Company Logo" style={{ maxHeight: '80px', maxWidth: '200px', objectFit: 'contain', background: 'white', padding: '10px', borderRadius: '8px' }} /></DraggableBlock>
             ) : (
-              <DraggableBlock id="header_brand" data={data} onChange={onChange}><h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>{data.billedBy.name || 'Your Brand'}</h2></DraggableBlock>
+              <DraggableBlock id="header_brand" data={data} onChange={onChange}><h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}><EditableValue value={data.billedBy.name} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, name: v}})} placeholder="Your Company Name" /></h2></DraggableBlock>
             )}
           </div>
         </div>
@@ -49,12 +54,12 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
         <DraggableBlock id="billedBy" data={data} onChange={onChange} style={{ flex: 1 }}>
           <div>
             <DraggableBlock id="billedBy_title" data={data} onChange={onChange}><h3 style={{ color: '#f97316', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>From</h3></DraggableBlock>
-            <DraggableBlock id="billedBy_name" data={data} onChange={onChange}><p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{data.billedBy.name || 'Your Company Name'}</p></DraggableBlock>
-            <DraggableBlock id="billedBy_address" data={data} onChange={onChange}><p style={{ whiteSpace: 'pre-wrap', color: '#555', marginTop: '4px' }}>{data.billedBy.address || 'Your Address'}</p></DraggableBlock>
+            <DraggableBlock id="billedBy_name" data={data} onChange={onChange}><p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}><EditableValue value={data.billedBy.name} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, name: v}})} placeholder="Your Company Name" /></p></DraggableBlock>
+            <DraggableBlock id="billedBy_address" data={data} onChange={onChange}><p style={{ whiteSpace: 'pre-wrap', color: '#555', marginTop: '4px' }}><EditableValue isTextArea value={data.billedBy.address} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, address: v}})} placeholder="Your Address" /></p></DraggableBlock>
             <div style={{ marginTop: '10px', fontSize: '0.85rem', color: '#666' }}>
-              {data.billedBy.phone && <DraggableBlock id="billedBy_phone" data={data} onChange={onChange}><div>P: {data.billedBy.phone}</div></DraggableBlock>}
-              {data.billedBy.email && <DraggableBlock id="billedBy_email" data={data} onChange={onChange}><div>E: {data.billedBy.email}</div></DraggableBlock>}
-              {data.billedBy.gstin && <DraggableBlock id="billedBy_gstin" data={data} onChange={onChange}><div>GST: {data.billedBy.gstin}</div></DraggableBlock>}
+              {data.billedBy.phone && <DraggableBlock id="billedBy_phone" data={data} onChange={onChange}><div>P: <EditableValue value={data.billedBy.phone} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, phone: v}})} placeholder="Phone" /></div></DraggableBlock>}
+              {data.billedBy.email && <DraggableBlock id="billedBy_email" data={data} onChange={onChange}><div>E: <EditableValue value={data.billedBy.email} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, email: v}})} placeholder="Email" /></div></DraggableBlock>}
+              {data.billedBy.gstin && <DraggableBlock id="billedBy_gstin" data={data} onChange={onChange}><div>GST: <EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, gstin: v}})} placeholder="GSTIN" /></div></DraggableBlock>}
             </div>
           </div>
         </DraggableBlock>
@@ -62,9 +67,9 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
         <DraggableBlock id="billedTo" data={data} onChange={onChange} style={{ flex: 1 }}>
           <div>
             <DraggableBlock id="billedTo_title" data={data} onChange={onChange}><h3 style={{ color: '#f97316', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>To</h3></DraggableBlock>
-            <DraggableBlock id="billedTo_name" data={data} onChange={onChange}><p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{data.billedTo.name || 'Client Name'}</p></DraggableBlock>
-            <DraggableBlock id="billedTo_address" data={data} onChange={onChange}><p style={{ whiteSpace: 'pre-wrap', color: '#555', marginTop: '4px' }}>{data.billedTo.address || 'Client Address'}</p></DraggableBlock>
-            {data.billedTo.gstin && <DraggableBlock id="billedTo_gstin" data={data} onChange={onChange}><p style={{ marginTop: '10px', fontSize: '0.85rem', color: '#666' }}>GST: {data.billedTo.gstin}</p></DraggableBlock>}
+            <DraggableBlock id="billedTo_name" data={data} onChange={onChange}><p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}><EditableValue value={data.billedTo.name} onChange={(v) => onChange?.({...data, billedTo: {...data.billedTo, name: v}})} placeholder="Client Name" /></p></DraggableBlock>
+            <DraggableBlock id="billedTo_address" data={data} onChange={onChange}><p style={{ whiteSpace: 'pre-wrap', color: '#555', marginTop: '4px' }}><EditableValue isTextArea value={data.billedTo.address} onChange={(v) => onChange?.({...data, billedTo: {...data.billedTo, address: v}})} placeholder="Client Address" /></p></DraggableBlock>
+            {data.billedTo.gstin && <DraggableBlock id="billedTo_gstin" data={data} onChange={onChange}><p style={{ marginTop: '10px', fontSize: '0.85rem', color: '#666' }}>GST: <EditableValue value={data.billedTo.gstin} onChange={(v) => onChange?.({...data, billedTo: {...data.billedTo, gstin: v}})} placeholder="GSTIN" /></p></DraggableBlock>}
           </div>
         </DraggableBlock>
 
@@ -72,14 +77,18 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
           <div>
              <DraggableBlock id="details_title" data={data} onChange={onChange}><h3 style={{ color: '#f97316', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Details</h3></DraggableBlock>
              <div style={{ background: '#fff7ed', padding: '15px', borderRadius: '8px', border: '1px solid #ffedd5' }}>
-               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                 <DraggableBlock id="details_dateLabel" data={data} onChange={onChange}><span style={{ color: '#666' }}>Date:</span></DraggableBlock>
-                 <DraggableBlock id="details_dateVal" data={data} onChange={onChange}><span style={{ fontWeight: 'bold' }}>{data.date}</span></DraggableBlock>
-               </div>
-               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                 <DraggableBlock id="details_dueLabel" data={data} onChange={onChange}><span style={{ color: '#666' }}>Due:</span></DraggableBlock>
-                 <DraggableBlock id="details_dueVal" data={data} onChange={onChange}><span style={{ fontWeight: 'bold' }}>{data.dueDate}</span></DraggableBlock>
-               </div>
+               {!data.hiddenFields?.includes('invoiceDate') && (
+                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                   <DraggableBlock id="details_dateLabel" data={data} onChange={onChange}><span style={{ color: '#666' }}>Date:</span></DraggableBlock>
+                   <DraggableBlock id="details_dateVal" data={data} onChange={onChange}><span style={{ fontWeight: 'bold' }}><EditableValue value={data.date} onChange={(v) => onChange?.({...data, date: v})} placeholder="Date" /></span></DraggableBlock>
+                 </div>
+               )}
+               {!data.hiddenFields?.includes('dueDate') && (
+                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                   <DraggableBlock id="details_dueLabel" data={data} onChange={onChange}><span style={{ color: '#666' }}>Due:</span></DraggableBlock>
+                   <DraggableBlock id="details_dueVal" data={data} onChange={onChange}><span style={{ fontWeight: 'bold' }}><EditableValue value={data.dueDate} onChange={(v) => onChange?.({...data, dueDate: v})} placeholder="Due Date" /></span></DraggableBlock>
+                 </div>
+               )}
              </div>
           </div>
         </DraggableBlock>
@@ -106,12 +115,15 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
               return (
                 <tr key={item.id || index}>
                   <td style={{ padding: '15px', borderBottom: '1px solid #eee' }}>
-                    <div style={{ fontWeight: 'bold' }}>{item.description || 'Item Name'}</div>
-                    {item.hsn && <div style={{ fontSize: '0.8rem', color: '#888' }}>HSN: {item.hsn} | GST: {item.gstRate}%</div>}
+                    {onChange && (
+                      <button className="delete-item-btn print-hidden" onClick={() => { const newItems = [...data.items]; newItems.splice(index, 1); onChange({...data, items: newItems}); }} style={{ marginRight: '6px' }}>×</button>
+                    )}
+                    <div style={{ fontWeight: 'bold', display: 'inline' }}><EditableValue value={item.description} onChange={(v) => { const newItems = [...data.items]; newItems[index] = {...item, description: v}; onChange?.({...data, items: newItems})}} placeholder="Item Name" /></div>
+                    <div style={{ fontSize: '0.8rem', color: '#888' }}>HSN: <EditableValue value={item.hsn} onChange={(v) => { const newItems = [...data.items]; newItems[index] = {...item, hsn: v}; onChange?.({...data, items: newItems})}} placeholder="HSN" /> | GST: <EditableValue value={item.gstRate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = {...item, gstRate: parseFloat(v)||0}; onChange?.({...data, items: newItems})}} placeholder="0" />%</div>
                   </td>
-                  <td style={{ padding: '15px', textAlign: 'center', borderBottom: '1px solid #eee' }}>{item.quantity}</td>
-                  <td style={{ padding: '15px', textAlign: 'right', borderBottom: '1px solid #eee' }}>{data.currency || '₹'}{item.rate.toFixed(2)}</td>
-                  <td style={{ padding: '15px', textAlign: 'right', borderBottom: '1px solid #eee', fontWeight: 'bold' }}>{data.currency || '₹'}{amount.toFixed(2)}</td>
+                  <td style={{ padding: '15px', textAlign: 'center', borderBottom: '1px solid #eee' }}><EditableValue value={item.quantity.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = {...item, quantity: parseFloat(v)||0}; onChange?.({...data, items: newItems})}} placeholder="0" /></td>
+                  <td style={{ padding: '15px', textAlign: 'right', borderBottom: '1px solid #eee' }}>{data.currency || '₹'}<EditableValue value={item.rate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = {...item, rate: parseFloat(v)||0}; onChange?.({...data, items: newItems})}} placeholder="0" /></td>
+                  <td style={{ padding: '15px', textAlign: 'right', borderBottom: '1px solid #eee', fontWeight: 'bold' }}>{data.currency || '₹'}<EditableValue value={amount.toFixed(2)} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = {...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt}; onChange?.({...data, items: newItems})}} placeholder="0" /></td>
                 </tr>
               );
             })}
@@ -157,13 +169,26 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
         </DraggableBlock>
       </div>
 
-      {data.countryOfSupply && (
+      {data.countryOfSupply && !data.hiddenFields?.includes('placeOfSupply') && (
         <DraggableBlock id="countryOfSupply" data={data} onChange={onChange}>
           <div style={{ marginTop: '40px', fontSize: '0.85rem', color: '#666' }}>
-            <strong>Country of Supply:</strong> {data.countryOfSupply}
+            <strong>Country of Supply:</strong> <EditableValue value={data.countryOfSupply} onChange={(v) => onChange?.({...data, countryOfSupply: v})} placeholder="Country" />
           </div>
         </DraggableBlock>
       )}
+
+      <DraggableBlock id="creative_notes" data={data} onChange={onChange}>
+        <div style={{ marginTop: '20px', fontSize: '0.85rem', color: '#555' }}>
+          <strong>Notes:</strong>
+          <div style={{ whiteSpace: 'pre-wrap', marginTop: '4px' }}><EditableValue isTextArea value={data.notes} onChange={(v) => onChange?.({...data, notes: v})} placeholder="Enter notes here..." /></div>
+        </div>
+      </DraggableBlock>
+      <DraggableBlock id="creative_terms_cond" data={data} onChange={onChange}>
+        <div style={{ marginTop: '16px', fontSize: '0.85rem', color: '#555' }}>
+          <strong>Terms &amp; Conditions:</strong>
+          <div style={{ whiteSpace: 'pre-wrap', marginTop: '4px' }}><EditableValue isTextArea value={data.terms} onChange={(v) => onChange?.({...data, terms: v})} placeholder="Enter your terms and conditions here..." /></div>
+        </div>
+      </DraggableBlock>
 
       <DraggableBlock id="footerNote" data={data} onChange={onChange}>
         <div style={{ textAlign: 'center', marginTop: '60px', padding: '20px', color: '#999', fontSize: '0.8rem' }}>

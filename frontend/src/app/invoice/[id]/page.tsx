@@ -2,10 +2,11 @@
 import { useState, useEffect } from 'react';
 
 import { useRouter, useParams } from 'next/navigation';
-import { InvoiceForm } from '../../../components/InvoiceForm';
+import { SettingsToolbar } from '../../../components/SettingsToolbar';
 import { InvoicePreview } from '../../../components/InvoicePreview';
 import type { InvoiceData } from '../../../types/invoice';
 import { getInvoice, saveInvoice } from '../../../utils/storage';
+import { EditorProvider } from '../../../contexts/EditorContext';
 
 export default function InvoiceEditor() {
   const router = useRouter();
@@ -32,15 +33,15 @@ export default function InvoiceEditor() {
   if (!data) return null;
 
   return (
-    <div className="app-container" style={{ height: 'calc(100vh - 70px)' }}>
-      <div className="sidebar print-hidden">
-        <InvoiceForm data={data} onChange={setData} />
-      </div>
-      <div className="preview-container">
-        <div style={{ position: 'relative', width: '210mm' }}>
-          <InvoicePreview data={data} onChange={setData} />
+    <EditorProvider>
+      <div className="app-container" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <SettingsToolbar data={data} onChange={setData} />
+        <div className="preview-container" style={{ flex: 1, padding: '100px 40px 40px 40px', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ position: 'relative', width: '210mm', flexShrink: 0 }}>
+            <InvoicePreview data={data} onChange={setData} />
+          </div>
         </div>
       </div>
-    </div>
+    </EditorProvider>
   );
 }

@@ -50,4 +50,6 @@ export interface InvoiceData {
   terms?: string;
   signatureUrl?: string;
   layoutPositions?: Record<string, { x: number; y: number }>;
+  labels?: Record<string, string>;
+  hiddenFields?: string[];
 }

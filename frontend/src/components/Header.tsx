@@ -48,7 +48,7 @@ export const Header: React.FC = () => {
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/help')}>Help</span>
         </nav>
       ) : (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#64748b' }}>
+        <div className="mobile-hidden" style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#64748b' }}>
           <button style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, fontSize: '0.9rem' }}>
             <span style={{ transform: 'scaleX(-1)', display: 'inline-block' }}>&#x21BA;</span> Undo
           </button>
@@ -65,10 +65,11 @@ export const Header: React.FC = () => {
       )}
 
       {/* Right: Auth / CTA */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {isEditor ? (
           <>
             <button 
+              className="mobile-hidden"
               onClick={() => {}} 
               style={{ background: 'none', color: '#64748b', border: '1px solid #cbd5e1', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
             >
