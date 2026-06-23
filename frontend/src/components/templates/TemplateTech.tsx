@@ -152,7 +152,7 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
                   </tr>
                 );
               })}
-              {onChange && (
+            {data.items.length > 0 && onChange && (
             <tr className="print-hidden">
               <td colSpan={7} style={{ textAlign: 'center', padding: '10px' }}>
                 <button 

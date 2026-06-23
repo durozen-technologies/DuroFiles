@@ -131,9 +131,20 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
           </thead>
           <tbody>
             {data.items.length === 0 && (
-              <tr>
-                <td colSpan={4} style={{ textAlign: 'center', color: '#9ca3af', padding: '20px' }}>No items added yet</td>
-              </tr>
+               <tr>
+                 <td colSpan={4} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
+                    <div style={{ marginBottom: '10px' }}>No items added yet</div>
+                    {onChange && (
+                      <button 
+                        className="print-hidden"
+                        onClick={() => onChange({...data, items: [{ id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]})}
+                        style={{ padding: '8px 16px', backgroundColor: '#e40097', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                      >
+                        + Add Item
+                      </button>
+                    )}
+                 </td>
+               </tr>
             )}
             {data.items.map((item, index) => {
               const amount = item.quantity * item.rate;
@@ -158,9 +169,9 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
                 </tr>
               );
             })}
-            {onChange && (
+            {data.items.length > 0 && onChange && (
               <tr className="print-hidden">
-                <td colSpan={7} style={{ textAlign: 'center', padding: '10px' }}>
+                <td colSpan={4} style={{ textAlign: 'center', padding: '10px' }}>
                   <button
                     className="add-item-btn"
                     onClick={() => onChange({ ...data, items: [...data.items, { id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }] })}

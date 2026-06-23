@@ -11,8 +11,66 @@ export const Header: React.FC = () => {
 
   const handleResetLayout = () => {
     if (confirm("Are you sure you want to reset all dragged elements to their default positions?")) {
-      localStorage.removeItem('invoice_positions');
-      window.location.reload();
+      window.dispatchEvent(new CustomEvent('reset-layout'));
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      (document.activeElement as HTMLElement)?.blur();
+      
+      const element = document.querySelector('.a4-paper') as HTMLElement;
+      if (!element) {
+        window.print();
+        return;
+      }
+      
+      // Temporarily hide UI elements inside the paper
+      const hiddenElements = element.querySelectorAll('.print-hidden');
+      const originalDisplays: string[] = [];
+      hiddenElements.forEach((el, index) => {
+        originalDisplays[index] = (el as HTMLElement).style.display;
+        (el as HTMLElement).style.display = 'none';
+      });
+
+      // Temporarily remove minHeight to prevent fractional pixel overflow causing a blank 2nd page
+      const originalMinHeight = element.style.getPropertyValue('min-height');
+      const originalHeight = element.style.getPropertyValue('height');
+      element.style.setProperty('min-height', '0px', 'important');
+      element.style.setProperty('height', 'max-content', 'important');
+
+      // Dynamically import libraries to avoid SSR issues
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      let finalWidth = pdfWidth;
+      let finalHeight = (canvas.height * finalWidth) / canvas.width;
+      
+      // Force it to fit on exactly ONE page by scaling it down if it's too tall
+      if (finalHeight > 297) {
+        const ratio = 297 / finalHeight;
+        finalHeight = 297;
+        finalWidth = finalWidth * ratio;
+      }
+      
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      pdf.addImage(imgData, 'JPEG', xOffset, 0, finalWidth, finalHeight);
+      pdf.save(`Invoice_${new Date().toISOString().split('T')[0]}.pdf`);
+
+      // Restore UI elements and styles
+      if (originalMinHeight) element.style.setProperty('min-height', originalMinHeight); else element.style.removeProperty('min-height');
+      if (originalHeight) element.style.setProperty('height', originalHeight); else element.style.removeProperty('height');
+      hiddenElements.forEach((el, index) => {
+        (el as HTMLElement).style.display = originalDisplays[index];
+      });
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+      window.print();
     }
   };
 
@@ -39,29 +97,14 @@ export const Header: React.FC = () => {
         )}
       </div>
 
-      {/* Center: Global Navigation or Editor Tools */}
-      {!isEditor ? (
+      {/* Center: Global Navigation */}
+      {!isEditor && (
         <nav style={{ display: 'flex', gap: '24px', alignItems: 'center', fontWeight: 500, fontSize: '0.95rem', color: '#475569' }}>
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/')}>Home</span>
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/templates')}>Templates</span>
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/tools')}>Tools</span>
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/help')}>Help</span>
         </nav>
-      ) : (
-        <div className="mobile-hidden" style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#64748b' }}>
-          <button style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, fontSize: '0.9rem' }}>
-            <span style={{ transform: 'scaleX(-1)', display: 'inline-block' }}>&#x21BA;</span> Undo
-          </button>
-          <button style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, fontSize: '0.9rem' }}>
-            <span>&#x21BA;</span> Redo
-          </button>
-          <div style={{ width: '1px', height: '16px', background: '#e2e8f0' }} />
-          <select style={{ border: 'none', background: 'transparent', color: '#475569', fontWeight: 600, fontSize: '0.9rem', outline: 'none', cursor: 'pointer' }}>
-            <option>100%</option>
-            <option>75%</option>
-            <option>50%</option>
-          </select>
-        </div>
       )}
 
       {/* Right: Auth / CTA */}
@@ -69,20 +112,13 @@ export const Header: React.FC = () => {
         {isEditor ? (
           <>
             <button 
-              className="mobile-hidden"
-              onClick={() => {}} 
-              style={{ background: 'none', color: '#64748b', border: '1px solid #cbd5e1', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-            >
-              Share
-            </button>
-            <button 
               onClick={handleResetLayout} 
               style={{ background: 'none', color: '#64748b', border: '1px solid #cbd5e1', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
             >
               <RefreshCw size={14} /> Reset Layout
             </button>
             <button 
-              onClick={() => window.print()} 
+              onClick={handleDownloadPDF} 
               className="btn"
               style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px' }}
             >

@@ -28,7 +28,7 @@ export const EditableImage: React.FC<Props> = ({ src, onChange, className, style
 
   return (
     <div 
-      className={`editable-image ${className || ''}`}
+      className={`editable-image ${className || ''} ${!src ? 'print-hidden' : ''}`}
       style={{ 
         position: 'relative', 
         cursor: 'pointer', 

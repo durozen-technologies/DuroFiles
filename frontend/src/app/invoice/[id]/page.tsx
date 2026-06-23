@@ -25,6 +25,14 @@ export default function InvoiceEditor() {
   }, [id, router]);
 
   useEffect(() => {
+    const handleReset = () => {
+      setData(prev => prev ? { ...prev, layoutPositions: {} } : null);
+    };
+    window.addEventListener('reset-layout', handleReset);
+    return () => window.removeEventListener('reset-layout', handleReset as EventListener);
+  }, []);
+
+  useEffect(() => {
     if (data) {
       saveInvoice(data);
     }

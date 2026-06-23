@@ -107,7 +107,18 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
           <tbody>
             {data.items.length === 0 && (
                <tr>
-                 <td colSpan={4} style={{ textAlign: 'center', padding: '30px', color: '#999' }}>No items added</td>
+                 <td colSpan={4} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
+                    <div style={{ marginBottom: '10px' }}>No items added yet</div>
+                    {onChange && (
+                      <button 
+                        className="print-hidden"
+                        onClick={() => onChange({...data, items: [{ id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]})}
+                        style={{ padding: '8px 16px', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                      >
+                        + Add Item
+                      </button>
+                    )}
+                 </td>
                </tr>
             )}
             {data.items.map((item, index) => {
@@ -127,6 +138,18 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
                 </tr>
               );
             })}
+            {data.items.length > 0 && onChange && (
+              <tr className="print-hidden">
+                <td colSpan={4} style={{ textAlign: 'center', padding: '10px' }}>
+                  <button 
+                    className="add-item-btn"
+                    onClick={() => onChange({...data, items: [...data.items, { id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]})}
+                  >
+                    + Add Item
+                  </button>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </DraggableBlock>
