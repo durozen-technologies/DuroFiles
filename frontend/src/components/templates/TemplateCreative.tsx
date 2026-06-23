@@ -157,18 +157,30 @@ export const TemplateCreative: React.FC<Props> = ({ data, onChange }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <DraggableBlock id="payment" data={data} onChange={onChange} style={{ width: '50%' }}>
           <div>
-            {data.upiId && (
+            {(!data.hiddenFields?.includes('qrCode') || !data.hiddenFields?.includes('upiId')) && (
               <div>
-                 <DraggableBlock id="payment_title" data={data} onChange={onChange}><h3 style={{ color: '#f97316', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Payment Method</h3></DraggableBlock>
+                 <DraggableBlock id="payment_title" data={data} onChange={onChange}><h3 style={{ color: '#f97316', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}><EditableLabel id="lbl_payment_method" defaultText="Payment Method" data={data} onChange={onChange} /></h3></DraggableBlock>
                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                    <div style={{ background: '#fff7ed', padding: '10px', borderRadius: '8px' }}>
                       <DraggableBlock id="payment_qr" data={data} onChange={onChange}><QRCodeSVG value={upiUri} size={90} /></DraggableBlock>
                    </div>
                    <div>
-                     <DraggableBlock id="payment_scanText" data={data} onChange={onChange}><p style={{ fontWeight: 'bold' }}>Scan to Pay</p></DraggableBlock>
-                     <DraggableBlock id="payment_upiId" data={data} onChange={onChange}><p style={{ color: '#666', fontSize: '0.9rem', marginTop: '4px' }}>UPI ID: {data.upiId}</p></DraggableBlock>
+                     <DraggableBlock id="payment_scanText" data={data} onChange={onChange}><p style={{ fontWeight: 'bold' }}><EditableLabel id="lbl_scanToPay" defaultText="Scan to Pay" data={data} onChange={onChange} /></p></DraggableBlock>
+                     <DraggableBlock id="payment_upiId" data={data} onChange={onChange}><p style={{ color: '#666', fontSize: '0.9rem', marginTop: '4px' }}><EditableValue value={data.upiId} onChange={(v) => onChange?.({ ...data, upiId: v })} placeholder="example@upi" /></p></DraggableBlock>
                    </div>
                  </div>
+              </div>
+            )}
+            
+            {/* Bank Details Section */}
+            {!data.hiddenFields?.includes('bankDetails') && (
+              <div style={{ marginTop: (!data.hiddenFields?.includes('qrCode') || !data.hiddenFields?.includes('upiId')) ? '20px' : '0' }}>
+                <DraggableBlock id="payment_bank_title" data={data} onChange={onChange}><h3 style={{ color: '#f97316', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}><EditableLabel id="lbl_bank_details" defaultText="Bank Details" data={data} onChange={onChange} /></h3></DraggableBlock>
+                <div style={{ fontSize: '0.8rem', lineHeight: '1.6', color: '#555' }}>
+                  <DraggableBlock id="payment_bankName" data={data} onChange={onChange}><div><span style={{ fontWeight: 'bold', color: '#333' }}><EditableLabel id="lbl_bank_name" defaultText="Bank:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.bankName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, bankName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Bank Name" /></div></DraggableBlock>
+                  <DraggableBlock id="payment_accNo" data={data} onChange={onChange}><div><span style={{ fontWeight: 'bold', color: '#333' }}><EditableLabel id="lbl_acc_no" defaultText="A/C No:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.accountNumber} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, accountNumber: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Account Number" /></div></DraggableBlock>
+                  <DraggableBlock id="payment_ifsc" data={data} onChange={onChange}><div><span style={{ fontWeight: 'bold', color: '#333' }}><EditableLabel id="lbl_ifsc" defaultText="IFSC:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.ifsc} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, ifsc: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="IFSC Code" /></div></DraggableBlock>
+                </div>
               </div>
             )}
           </div>

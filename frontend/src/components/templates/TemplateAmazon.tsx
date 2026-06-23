@@ -238,11 +238,14 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '20px', marginBottom: '30px' }}>
         <DraggableBlock id="amazon_footer_1" data={data} onChange={onChange}>
           <div>
-            {data.upiId && (
+            {(!data.hiddenFields?.includes('qrCode') || !data.hiddenFields?.includes('upiId')) && (
               <>
                 <strong>Pay using UPI:</strong><br /><br />
                 <div style={{ width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <QRCodeSVG value={upiUri} size={90} />
+                </div>
+                <div style={{ fontSize: '10px', marginTop: '4px' }}>
+                  UPI ID: <EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" />
                 </div>
               </>
             )}
@@ -250,12 +253,12 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
         </DraggableBlock>
         <DraggableBlock id="amazon_footer_2" data={data} onChange={onChange}>
           <div>
-            {(data.paymentDetails?.bankName || data.paymentDetails?.accountNumber) && (
+            {!data.hiddenFields?.includes('bankDetails') && (
               <>
                 <strong>Bank Details:</strong><br /><br />
-                {data.paymentDetails.bankName && <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '80px' }}>Bank:</span> <strong>{data.paymentDetails.bankName}</strong></p>}
-                {data.paymentDetails.accountNumber && <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '80px' }}>Account #:</span> <strong>{data.paymentDetails.accountNumber}</strong></p>}
-                {data.paymentDetails.ifsc && <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '80px' }}>IFSC:</span> <strong>{data.paymentDetails.ifsc}</strong></p>}
+                <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px' }}>Bank:</span> <strong><EditableValue value={data.paymentDetails?.bankName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, bankName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Bank Name" /></strong></p>
+                <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px' }}>A/C No:</span> <strong><EditableValue value={data.paymentDetails?.accountNumber} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, accountNumber: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Account Number" /></strong></p>
+                <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px' }}>IFSC:</span> <strong><EditableValue value={data.paymentDetails?.ifsc} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, ifsc: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="IFSC Code" /></strong></p>
               </>
             )}
           </div>

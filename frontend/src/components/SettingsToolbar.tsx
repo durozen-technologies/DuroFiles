@@ -207,6 +207,8 @@ export const SettingsToolbar: React.FC<Props> = ({ data, onChange }) => {
                 { id: 'notes', label: 'Notes' },
                 { id: 'terms', label: 'Terms' },
                 { id: 'signature', label: 'Stamp & Signature' },
+                { id: 'qrCode', label: 'UPI QR Code' },
+                { id: 'bankDetails', label: 'Bank Details' },
               ].map(section => (
                 <button
                   key={section.id}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import type { InvoiceData } from '../../types/invoice';
 import { DraggableBlock } from '../DraggableBlock';
 import { EditableLabel } from '../EditableLabel';
@@ -29,6 +30,7 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
   const grandTotal = subtotal + totalTax;
 
   const cgstSgstRateStr = (rate: number) => `${rate / 2}%`;
+  const upiUri = `upi://pay?pa=${data.upiId}&pn=${encodeURIComponent(data.billedBy.name)}&am=${grandTotal.toFixed(2)}&cu=INR`;
 
   return (
     <div className="a4-paper template-gst-standard" style={{ fontFamily: 'Arial, sans-serif', color: '#333' }}>
@@ -192,7 +194,36 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
 
       {/* Totals Section */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
-        <div style={{ flex: 1 }}></div>
+        <div style={{ flex: 1, paddingRight: '40px' }}>
+          {/* UPI Section */}
+          {(!data.hiddenFields?.includes('qrCode') || !data.hiddenFields?.includes('upiId')) && (
+            <DraggableBlock id="payment_upi" data={data} onChange={onChange}>
+              <div style={{ marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+                <div style={{ border: '1px solid #ddd', padding: '8px', borderRadius: '4px' }}>
+                  <QRCodeSVG value={upiUri} size={80} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.85rem', color: '#555', fontWeight: 'bold' }}><EditableLabel id="lbl_scanToPay" defaultText="Scan to Pay via UPI" data={data} onChange={onChange} /></div>
+                  <div style={{ fontSize: '0.8rem', color: '#333', marginTop: '4px' }}>UPI ID: <EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" /></div>
+                </div>
+              </div>
+            </DraggableBlock>
+          )}
+
+          {/* Bank Details Section */}
+          {!data.hiddenFields?.includes('bankDetails') && (
+            <DraggableBlock id="bank_details_section" data={data} onChange={onChange}>
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: '8px', fontWeight: 'bold' }}><EditableLabel id="lbl_bank_details" defaultText="Bank Details" data={data} onChange={onChange} /></div>
+                <div style={{ fontSize: '0.8rem', color: '#333' }}>
+                  <div style={{ marginBottom: '4px' }}><strong><EditableLabel id="lbl_bank_name" defaultText="Bank Name:" data={data} onChange={onChange} /></strong> <EditableValue value={data.paymentDetails?.bankName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, bankName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Bank Name" /></div>
+                  <div style={{ marginBottom: '4px' }}><strong><EditableLabel id="lbl_acc_no" defaultText="Account No:" data={data} onChange={onChange} /></strong> <EditableValue value={data.paymentDetails?.accountNumber} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, accountNumber: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Account Number" /></div>
+                  <div style={{ marginBottom: '4px' }}><strong><EditableLabel id="lbl_ifsc" defaultText="IFSC Code:" data={data} onChange={onChange} /></strong> <EditableValue value={data.paymentDetails?.ifsc} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, ifsc: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="IFSC Code" /></div>
+                </div>
+              </div>
+            </DraggableBlock>
+          )}
+        </div>
         <DraggableBlock id="totals_section" data={data} onChange={onChange}>
           <div style={{ width: '300px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.85rem' }}>

@@ -52,4 +52,5 @@ export interface InvoiceData {
   layoutPositions?: Record<string, { x: number; y: number }>;
   labels?: Record<string, string>;
   hiddenFields?: string[];
+  upiId?: string;
 }
