@@ -66,13 +66,13 @@ export default function Templates() {
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '60px 20px', width: '100%' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '30px' }}>
-          <TemplateCard id="modern" name="Modern" desc="A clean, professional template with a subtle purple accent." color="#6366f1" image="/templates/modern.png" />
-          <TemplateCard id="classic" name="Classic" desc="Minimalist black and white design perfect for traditional businesses." color="#475569" image="/templates/classic.png" />
-          <TemplateCard id="creative" name="Creative" desc="Bold orange accents for a creative agency look." color="#f97316" image="/templates/creative.png" />
           <TemplateCard id="tech" name="Tech" desc="Green and sleek, optimized for software and IT services." color="#10b981" image="/templates/tech.png" />
           <TemplateCard id="amazon_style" name="Amazon Style" desc="A detailed, tabular template inspired by e-commerce invoices." color="#0f172a" image="/templates/amazon.png" />
           <TemplateCard id="gst_standard" name="GST Standard" desc="Formal, structured layout with detailed columns for Indian GST compliance." color="#1d4ed8" image="/templates/gststandard.png" />
           <TemplateCard id="instagram_style" name="Instagram Style" desc="Modern aesthetic with social media inspired pink and purple gradients." color="#db2777" image="/templates/instagram.png" />
+          <TemplateCard id="modern" name="Modern" desc="A clean, professional template with a subtle purple accent." color="#6366f1" image="/templates/modern.png" />
+          <TemplateCard id="classic" name="Classic" desc="Minimalist black and white design perfect for traditional businesses." color="#475569" image="/templates/classic.png" />
+          <TemplateCard id="creative" name="Creative" desc="Bold orange accents for a creative agency look." color="#f97316" image="/templates/creative.png" />
         </div>
       </div>
       
