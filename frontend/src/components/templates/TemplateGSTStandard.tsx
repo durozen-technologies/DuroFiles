@@ -1,5 +1,5 @@
 import React from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+
 import type { InvoiceData } from '../../types/invoice';
 import { DraggableBlock } from '../DraggableBlock';
 import { EditableLabel } from '../EditableLabel';
@@ -50,7 +50,7 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
 
         <DraggableBlock id="header_right" data={data} onChange={onChange}>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '2rem', color: '#333', letterSpacing: '2px', marginBottom: '16px' }}><EditableLabel id="lbl_invoice" defaultText="TAX INVOICE" data={data} onChange={onChange} /></div>
+            <div style={{ fontSize: '2rem', color: '#333', letterSpacing: '2px', marginBottom: '16px' }}><EditableLabel id="lbl_invoice" defaultText="Invoice" data={data} onChange={onChange} /></div>
             {!data.hiddenFields?.includes('invoiceNo') && (
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', fontSize: '0.85rem', marginBottom: '6px' }}>
                 <span style={{ color: '#555' }}>Invoice#</span>
@@ -117,20 +117,20 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
           </thead>
           <tbody>
             {data.items.length === 0 && (
-               <tr>
-                 <td colSpan={isIGST ? 8 : 9} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
-                    <div style={{ marginBottom: '10px' }}>No items added yet</div>
-                    {onChange && (
-                      <button 
-                        className="print-hidden"
-                        onClick={() => onChange({...data, items: [{ id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]})}
-                        style={{ padding: '8px 16px', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
-                      >
-                        + Add Item
-                      </button>
-                    )}
-                 </td>
-               </tr>
+              <tr>
+                <td colSpan={isIGST ? 8 : 9} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
+                  <div style={{ marginBottom: '10px' }}>No items added yet</div>
+                  {onChange && (
+                    <button
+                      className="print-hidden"
+                      onClick={() => onChange({ ...data, items: [{ id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }] })}
+                      style={{ padding: '8px 16px', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                    >
+                      + Add Item
+                    </button>
+                  )}
+                </td>
+              </tr>
             )}
             {data.items.map((item, index) => {
               const amount = item.quantity * item.rate;
@@ -200,11 +200,11 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
             <DraggableBlock id="payment_upi" data={data} onChange={onChange}>
               <div style={{ marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center' }}>
                 <div style={{ border: '1px solid #ddd', padding: '8px', borderRadius: '4px' }}>
-                  <QRCodeSVG value={upiUri} size={80} />
+                  <EditableImage src={data.qrCodeUrl || ''} onChange={(src) => onChange?.({...data, qrCodeUrl: src})} fallbackText="Upload QR" style={{ width: '80px', height: '80px', margin: '0 auto' }} />
                 </div>
                 <div>
                   <div style={{ fontSize: '0.85rem', color: '#555', fontWeight: 'bold' }}><EditableLabel id="lbl_scanToPay" defaultText="Scan to Pay via UPI" data={data} onChange={onChange} /></div>
-                  <div style={{ fontSize: '0.8rem', color: '#333', marginTop: '4px' }}>UPI ID: <EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" /></div>
+                  <div style={{ fontSize: '0.8rem', color: '#333', marginTop: '4px' }}>UPI ID: <EditableValue value={data.upiId} onChange={(v) => onChange?.({ ...data, upiId: v })} placeholder="example@upi" /></div>
                 </div>
               </div>
             </DraggableBlock>
@@ -219,6 +219,7 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
                   <div style={{ marginBottom: '4px' }}><strong><EditableLabel id="lbl_bank_name" defaultText="Bank Name:" data={data} onChange={onChange} /></strong> <EditableValue value={data.paymentDetails?.bankName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, bankName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Bank Name" /></div>
                   <div style={{ marginBottom: '4px' }}><strong><EditableLabel id="lbl_acc_no" defaultText="Account No:" data={data} onChange={onChange} /></strong> <EditableValue value={data.paymentDetails?.accountNumber} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, accountNumber: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Account Number" /></div>
                   <div style={{ marginBottom: '4px' }}><strong><EditableLabel id="lbl_ifsc" defaultText="IFSC Code:" data={data} onChange={onChange} /></strong> <EditableValue value={data.paymentDetails?.ifsc} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, ifsc: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="IFSC Code" /></div>
+                  <div style={{ marginBottom: '4px' }}><strong><EditableLabel id="lbl_branch" defaultText="Branch Name:" data={data} onChange={onChange} /></strong> <EditableValue value={data.paymentDetails?.branchName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, branchName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Branch Name" /></div>
                 </div>
               </div>
             </DraggableBlock>

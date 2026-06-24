@@ -1,5 +1,5 @@
 import React from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+
 import type { InvoiceData } from '../../types/invoice';
 import { DraggableBlock } from '../DraggableBlock';
 import { EditableLabel } from '../EditableLabel';
@@ -42,7 +42,7 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <DraggableBlock id="amazon_header_left" data={data} onChange={onChange}>
           <div>
-            <h1 style={{ color: '#004b91', fontSize: '16px', margin: '0 0 5px 0', textTransform: 'uppercase', letterSpacing: '1px' }}>Tax Invoice</h1>
+            <h1 style={{ color: '#004b91', fontSize: '16px', margin: '0 0 5px 0', textTransform: 'uppercase', letterSpacing: '1px' }}>Invoice</h1>
             <h2 style={{ fontSize: '20px', margin: '0 0 5px 0', color: '#000' }}><EditableValue value={data.billedBy.name} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, name: v } })} placeholder="Your Company Name" /></h2>
             {data.billedBy.gstin && <p style={{ margin: '2px 0' }}><strong>GSTIN <EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, gstin: v } })} placeholder="GSTIN" /></strong></p>}
             <p style={{ margin: '2px 0', whiteSpace: 'pre-wrap' }}><EditableValue isTextArea value={data.billedBy.address} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, address: v } })} placeholder="Your Address" /></p>
@@ -125,20 +125,20 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
           </thead>
           <tbody>
             {data.items.length === 0 && (
-               <tr>
-                 <td colSpan={7} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
-                    <div style={{ marginBottom: '10px' }}>No items added yet</div>
-                    {onChange && (
-                      <button 
-                        className="print-hidden"
-                        onClick={() => onChange({...data, items: [{ id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]})}
-                        style={{ padding: '8px 16px', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
-                      >
-                        + Add Item
-                      </button>
-                    )}
-                 </td>
-               </tr>
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
+                  <div style={{ marginBottom: '10px' }}>No items added yet</div>
+                  {onChange && (
+                    <button
+                      className="print-hidden"
+                      onClick={() => onChange({ ...data, items: [{ id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }] })}
+                      style={{ padding: '8px 16px', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                    >
+                      + Add Item
+                    </button>
+                  )}
+                </td>
+              </tr>
             )}
             {data.items.map((item, index) => {
               const amount = item.quantity * item.rate;
@@ -242,10 +242,10 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
               <>
                 <strong>Pay using UPI:</strong><br /><br />
                 <div style={{ width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <QRCodeSVG value={upiUri} size={90} />
+                  <EditableImage src={data.qrCodeUrl || ''} onChange={(src) => onChange?.({...data, qrCodeUrl: src})} fallbackText="Upload QR" style={{ width: '90px', height: '90px', margin: '0 auto' }} />
                 </div>
                 <div style={{ fontSize: '10px', marginTop: '4px' }}>
-                  UPI ID: <EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" />
+                  UPI ID: <EditableValue value={data.upiId} onChange={(v) => onChange?.({ ...data, upiId: v })} placeholder="example@upi" />
                 </div>
               </>
             )}
@@ -259,6 +259,7 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
                 <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px' }}>Bank:</span> <strong><EditableValue value={data.paymentDetails?.bankName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, bankName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Bank Name" /></strong></p>
                 <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px' }}>A/C No:</span> <strong><EditableValue value={data.paymentDetails?.accountNumber} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, accountNumber: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Account Number" /></strong></p>
                 <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px' }}>IFSC:</span> <strong><EditableValue value={data.paymentDetails?.ifsc} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, ifsc: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="IFSC Code" /></strong></p>
+                <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px' }}>Branch:</span> <strong><EditableValue value={data.paymentDetails?.branchName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, branchName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Branch Name" /></strong></p>
               </>
             )}
           </div>

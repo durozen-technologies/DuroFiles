@@ -1,5 +1,5 @@
 import React from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+
 import type { InvoiceData } from '../../types/invoice';
 import { DraggableBlock } from '../DraggableBlock';
 import { EditableLabel } from '../EditableLabel';
@@ -45,7 +45,7 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
             {!data.hiddenFields?.includes('logo') && (
               <EditableImage src={data.logoUrl || ''} onChange={(v) => onChange?.({ ...data, logoUrl: v })} style={{ maxWidth: '160px', maxHeight: '45px', objectFit: 'contain', marginBottom: '10px', borderRadius: '4px' }} fallbackText="Logo" />
             )}
-            <h1 style={{ fontSize: '12px', margin: '0', textTransform: 'uppercase', letterSpacing: '2px', color: '#000' }}>Tax Invoice</h1>
+            <h1 style={{ fontSize: '12px', margin: '0', textTransform: 'uppercase', letterSpacing: '2px', color: '#000' }}>Invoice</h1>
           </div>
         </DraggableBlock>
 
@@ -92,21 +92,21 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
                   <span style={{ fontWeight: 'bold' }}><EditableValue value={data.invoiceNumber} onChange={(v) => onChange?.({ ...data, invoiceNumber: v })} placeholder="INV-001" /></span>
                 </>
               )}
-              
+
               {!data.hiddenFields?.includes('invoiceDate') && (
                 <>
                   <span style={{ color: '#555', paddingRight: '10px' }}>Invoice Date:</span>
                   <span style={{ fontWeight: 'bold' }}><EditableValue value={data.date} onChange={(v) => onChange?.({ ...data, date: v })} placeholder="Date" /></span>
                 </>
               )}
-              
+
               {!data.hiddenFields?.includes('dueDate') && (
                 <>
                   <span style={{ color: '#555', paddingRight: '10px' }}>Due Date:</span>
                   <span style={{ fontWeight: 'bold' }}><EditableValue value={data.dueDate} onChange={(v) => onChange?.({ ...data, dueDate: v })} placeholder="Due Date" /></span>
                 </>
               )}
-              
+
               {data.countryOfSupply && !data.hiddenFields?.includes('placeOfSupply') && (
                 <>
                   <span style={{ color: '#555', paddingRight: '10px' }}>Place of Supply:</span>
@@ -131,20 +131,20 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
           </thead>
           <tbody>
             {data.items.length === 0 && (
-               <tr>
-                 <td colSpan={4} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
-                    <div style={{ marginBottom: '10px' }}>No items added yet</div>
-                    {onChange && (
-                      <button 
-                        className="print-hidden"
-                        onClick={() => onChange({...data, items: [{ id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]})}
-                        style={{ padding: '8px 16px', backgroundColor: '#e40097', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
-                      >
-                        + Add Item
-                      </button>
-                    )}
-                 </td>
-               </tr>
+              <tr>
+                <td colSpan={4} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
+                  <div style={{ marginBottom: '10px' }}>No items added yet</div>
+                  {onChange && (
+                    <button
+                      className="print-hidden"
+                      onClick={() => onChange({ ...data, items: [{ id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }] })}
+                      style={{ padding: '8px 16px', backgroundColor: '#e40097', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                    >
+                      + Add Item
+                    </button>
+                  )}
+                </td>
+              </tr>
             )}
             {data.items.map((item, index) => {
               const amount = item.quantity * item.rate;
@@ -248,10 +248,10 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
               <>
                 <strong>Pay using UPI:</strong><br /><br />
                 <div style={{ width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <QRCodeSVG value={upiUri} size={90} />
+                  <EditableImage src={data.qrCodeUrl || ''} onChange={(src) => onChange?.({...data, qrCodeUrl: src})} fallbackText="Upload QR" style={{ width: '90px', height: '90px', margin: '0 auto' }} />
                 </div>
                 <div style={{ fontSize: '10px', marginTop: '4px' }}>
-                  UPI ID: <EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" />
+                  UPI ID: <EditableValue value={data.upiId} onChange={(v) => onChange?.({ ...data, upiId: v })} placeholder="example@upi" />
                 </div>
               </>
             )}
@@ -265,6 +265,7 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
                 <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px', color: '#555' }}>Bank:</span> <strong><EditableValue value={data.paymentDetails?.bankName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, bankName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Bank Name" /></strong></p>
                 <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px', color: '#555' }}>A/C No:</span> <strong><EditableValue value={data.paymentDetails?.accountNumber} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, accountNumber: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Account Number" /></strong></p>
                 <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px', color: '#555' }}>IFSC:</span> <strong><EditableValue value={data.paymentDetails?.ifsc} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, ifsc: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="IFSC Code" /></strong></p>
+                <p style={{ margin: '3px 0', display: 'flex' }}><span style={{ width: '60px', color: '#555' }}>Branch:</span> <strong><EditableValue value={data.paymentDetails?.branchName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, branchName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Branch Name" /></strong></p>
               </>
             )}
           </div>

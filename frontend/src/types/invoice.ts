@@ -43,6 +43,7 @@ export interface InvoiceData {
     bankName?: string;
     accountNumber?: string;
     ifsc?: string;
+    branchName?: string;
     upiId: string;
     paymentTerms?: string;
   };
@@ -53,4 +54,5 @@ export interface InvoiceData {
   labels?: Record<string, string>;
   hiddenFields?: string[];
   upiId?: string;
+  qrCodeUrl?: string;
 }

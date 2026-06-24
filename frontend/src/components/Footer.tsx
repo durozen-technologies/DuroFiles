@@ -16,7 +16,6 @@ export const Footer: React.FC = () => {
           <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '20px', color: '#0f172a' }}>Resources</h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <li><a href="#" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.95rem' }}>Blog</a></li>
-            <li><a href="/help" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.95rem' }}>Help Center</a></li>
             <li><a href="#" style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.95rem' }}>Tutorials</a></li>
           </ul>
         </div>

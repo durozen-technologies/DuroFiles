@@ -1,5 +1,5 @@
 import React from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+
 import type { InvoiceData } from '../../types/invoice';
 import { DraggableBlock } from '../DraggableBlock';
 import { EditableLabel } from '../EditableLabel';
@@ -177,7 +177,7 @@ export const TemplateModern: React.FC<Props> = ({ data, onChange }) => {
                     <DraggableBlock id="payment_desc" data={data} onChange={onChange}><div className="payment-desc"><EditableLabel id="lbl_scanDesc" defaultText="Maximum of 1 lakh can be transferred via upi in a single day" data={data} onChange={onChange} /></div></DraggableBlock>
                     <DraggableBlock id="payment_qr" data={data} onChange={onChange}>
                       <div className="qr-code-box">
-                        <QRCodeSVG value={upiUri} size={90} />
+                        <EditableImage src={data.qrCodeUrl || ''} onChange={(src) => onChange?.({...data, qrCodeUrl: src})} fallbackText="Upload QR" style={{ width: '90px', height: '90px', margin: '0 auto' }} />
                       </div>
                     </DraggableBlock>
                   </>
@@ -196,6 +196,7 @@ export const TemplateModern: React.FC<Props> = ({ data, onChange }) => {
                   <DraggableBlock id="payment_bankName" data={data} onChange={onChange}><div><span style={{ fontWeight: 600 }}><EditableLabel id="lbl_bank_name" defaultText="Bank:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.bankName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, bankName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Bank Name" /></div></DraggableBlock>
                   <DraggableBlock id="payment_accNo" data={data} onChange={onChange}><div><span style={{ fontWeight: 600 }}><EditableLabel id="lbl_acc_no" defaultText="A/C No:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.accountNumber} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, accountNumber: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Account Number" /></div></DraggableBlock>
                   <DraggableBlock id="payment_ifsc" data={data} onChange={onChange}><div><span style={{ fontWeight: 600 }}><EditableLabel id="lbl_ifsc" defaultText="IFSC:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.ifsc} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, ifsc: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="IFSC Code" /></div></DraggableBlock>
+                  <DraggableBlock id="payment_branch" data={data} onChange={onChange}><div><span style={{ fontWeight: 600 }}><EditableLabel id="lbl_branch" defaultText="Branch:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.branchName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, branchName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Branch Name" /></div></DraggableBlock>
                 </div>
               </div>
             )}

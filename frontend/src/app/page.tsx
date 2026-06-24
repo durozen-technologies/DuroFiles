@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
-      
+
       {/* Hero Section */}
       <section style={{ padding: '120px 20px', textAlign: 'center', background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -27,7 +27,7 @@ export default function Home() {
             Fast, secure, and professional invoicing platform for freelancers and businesses. Completely free to use.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button onClick={() => router.push('/dashboard')} style={{ background: 'var(--primary-color)', color: 'white', padding: '16px 32px', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px var(--primary-color)' }}>
+            <button onClick={() => router.push('/templates')} style={{ background: 'var(--primary-color)', color: 'white', padding: '16px 32px', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px var(--primary-color)' }}>
               Create Invoice <ChevronRight size={20} />
             </button>
             <button onClick={() => router.push('/templates')} style={{ background: 'white', color: '#0f172a', padding: '16px 32px', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 600, border: '1px solid #cbd5e1', cursor: 'pointer', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }}>
@@ -44,7 +44,7 @@ export default function Home() {
             <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>Why Choose DuroFiles?</h2>
             <p style={{ fontSize: '1.1rem', color: '#64748b' }}>Built for speed and privacy. No accounts required.</p>
           </div>
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px' }}>
             {features.map((f, i) => (
               <div key={i} style={{ padding: '30px', borderRadius: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', transition: 'transform 0.2s', cursor: 'pointer' }} className="feature-card">
@@ -65,7 +65,7 @@ export default function Home() {
           <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '40px' }}>Popular Features</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
             {['Invoice Generator'].map((tool, i) => (
-              <div key={i} style={{ background: 'white', padding: '24px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #e2e8f0', cursor: 'pointer' }} onClick={() => router.push('/dashboard')}>
+              <div key={i} style={{ background: 'white', padding: '24px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #e2e8f0', cursor: 'pointer' }} onClick={() => router.push('/templates')}>
                 <CheckCircle2 size={24} color="#3b82f6" />
                 <span style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e293b' }}>{tool}</span>
               </div>
@@ -90,7 +90,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
+
       <div style={{ marginTop: 'auto' }}>
         <Footer />
       </div>

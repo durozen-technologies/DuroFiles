@@ -27,10 +27,14 @@ export default function Templates() {
     router.push(`/invoice/${newInvoice.id}`);
   };
 
-  const TemplateCard = ({ name, desc, color }: any) => (
-    <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }} onClick={() => handleCreate(name)}>
-      <div style={{ height: '200px', background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem', fontWeight: 800 }}>
-        {name} Preview
+  const TemplateCard = ({ id, name, desc, color, image }: any) => (
+    <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.2s', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }} onClick={() => handleCreate(id || name)}>
+      <div style={{ height: '200px', background: color, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem', fontWeight: 800, overflow: 'hidden' }}>
+        {image ? (
+          <img src={image} alt={`${name} Preview`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          `${name} Preview`
+        )}
       </div>
       <div style={{ padding: '20px' }}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{name}</h3>
@@ -52,10 +56,13 @@ export default function Templates() {
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '60px 20px', width: '100%' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '30px' }}>
-          <TemplateCard name="Modern" desc="A clean, professional template with a subtle purple accent." color="#6366f1" />
-          <TemplateCard name="Classic" desc="Minimalist black and white design perfect for traditional businesses." color="#475569" />
-          <TemplateCard name="Creative" desc="Bold orange accents for a creative agency look." color="#f97316" />
-          <TemplateCard name="Tech" desc="Green and sleek, optimized for software and IT services." color="#10b981" />
+          <TemplateCard id="modern" name="Modern" desc="A clean, professional template with a subtle purple accent." color="#6366f1" image="/templates/modern.png" />
+          <TemplateCard id="classic" name="Classic" desc="Minimalist black and white design perfect for traditional businesses." color="#475569" image="/templates/classic.png" />
+          <TemplateCard id="creative" name="Creative" desc="Bold orange accents for a creative agency look." color="#f97316" image="/templates/creative.png" />
+          <TemplateCard id="tech" name="Tech" desc="Green and sleek, optimized for software and IT services." color="#10b981" image="/templates/tech.png" />
+          <TemplateCard id="amazon_style" name="Amazon Style" desc="A detailed, tabular template inspired by e-commerce invoices." color="#0f172a" image="/templates/amazon.png" />
+          <TemplateCard id="gst_standard" name="GST Standard" desc="Formal, structured layout with detailed columns for Indian GST compliance." color="#1d4ed8" image="/templates/gststandard.png" />
+          <TemplateCard id="instagram_style" name="Instagram Style" desc="Modern aesthetic with social media inspired pink and purple gradients." color="#db2777" image="/templates/instagram.png" />
         </div>
       </div>
       

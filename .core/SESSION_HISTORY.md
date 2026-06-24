@@ -7,7 +7,7 @@
 1. Initialized the Next.js project with a single-page Invoice Generator.
 2. Built the core form components and the live A4 preview panel.
 3. Implemented robust CSS for perfect `window.print()` PDF generation without cutoffs.
-4. Successfully migrated from a single-page app to a multi-page Dashboard web app (`/dashboard`, `invoice/[id]`).
+4. Successfully migrated from a single-page app to a multi-page Dashboard web app (`/templates`, `invoice/[id]`).
 5. Built a Template Engine with Modern, Classic, and Creative styles.
 6. Completely redesigned the Landing Page (`/`) to match a clean aesthetic.
 7. Created a context-aware global layout (`layout.tsx`).
@@ -35,3 +35,4 @@
 2. **Template Expansion:** Integrated `UPI QR Code` and editable `Bank Details` components into all 7 invoice templates (Modern, Classic, Creative, Tech, GST Standard, Amazon, Instagram).
 3. **Data Model Fix:** Fixed a TypeScript interface error by promoting `upiId` to the root `InvoiceData` payload structure.
 4. **Layout Normalization:** Unified Flexbox and CSS Grid alignments across all invoice footers ensuring consistent padding and layout for the new components.
+5. **UI Simplification:** Removed "Tools", "Help", and "Dashboard" links from the global navigation header and footer to streamline the interface.

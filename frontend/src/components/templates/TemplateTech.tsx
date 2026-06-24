@@ -1,5 +1,5 @@
 import React from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+
 import type { InvoiceData } from '../../types/invoice';
 import { DraggableBlock } from '../DraggableBlock';
 import { EditableLabel } from '../EditableLabel';
@@ -182,7 +182,7 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
                   <DraggableBlock id="payment_title" data={data} onChange={onChange}><h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 8px 0', color: '#111' }}><EditableLabel id="lbl_payment_method" defaultText="Payment Method" data={data} onChange={onChange} /></h4></DraggableBlock>
                   <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                     <div style={{ background: '#fff', padding: '8px', border: '1px solid #ddd', borderRadius: '8px' }}>
-                      <DraggableBlock id="payment_qr" data={data} onChange={onChange}><QRCodeSVG value={upiUri} size={80} /></DraggableBlock>
+                      <DraggableBlock id="payment_qr" data={data} onChange={onChange}><EditableImage src={data.qrCodeUrl || ''} onChange={(src) => onChange?.({...data, qrCodeUrl: src})} fallbackText="Upload QR" style={{ width: '80px', height: '80px', margin: '0 auto' }} /></DraggableBlock>
                     </div>
                     <div>
                       <DraggableBlock id="payment_method" data={data} onChange={onChange}><p style={{ margin: '0 0 4px 0', color: '#444', fontSize: '0.9rem', fontWeight: 'bold' }}><EditableLabel id="lbl_scanToPay" defaultText="Scan to Pay via UPI" data={data} onChange={onChange} /></p></DraggableBlock>
@@ -200,6 +200,7 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
                     <DraggableBlock id="payment_bankName" data={data} onChange={onChange}><div><span style={{ fontWeight: 'bold', color: '#111' }}><EditableLabel id="lbl_bank_name" defaultText="Bank:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.bankName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, bankName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Bank Name" /></div></DraggableBlock>
                     <DraggableBlock id="payment_accNo" data={data} onChange={onChange}><div><span style={{ fontWeight: 'bold', color: '#111' }}><EditableLabel id="lbl_acc_no" defaultText="A/C No:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.accountNumber} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, accountNumber: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Account Number" /></div></DraggableBlock>
                     <DraggableBlock id="payment_ifsc" data={data} onChange={onChange}><div><span style={{ fontWeight: 'bold', color: '#111' }}><EditableLabel id="lbl_ifsc" defaultText="IFSC:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.ifsc} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, ifsc: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="IFSC Code" /></div></DraggableBlock>
+                    <DraggableBlock id="payment_branch" data={data} onChange={onChange}><div><span style={{ fontWeight: 'bold', color: '#111' }}><EditableLabel id="lbl_branch" defaultText="Branch:" data={data} onChange={onChange} /></span> <EditableValue value={data.paymentDetails?.branchName} onChange={(v) => onChange?.({ ...data, paymentDetails: { ...data.paymentDetails, branchName: v, upiId: data.paymentDetails?.upiId || '' } })} placeholder="Branch Name" /></div></DraggableBlock>
                   </div>
                 </div>
               )}

@@ -88,7 +88,7 @@ export const Header: React.FC = () => {
           <>
             <div style={{ width: '1px', height: '24px', background: '#cbd5e1' }} />
             <button 
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/templates')}
               style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#64748b', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}
             >
               <ArrowLeft size={16} /> Back
@@ -102,14 +102,12 @@ export const Header: React.FC = () => {
         <nav style={{ display: 'flex', gap: '24px', alignItems: 'center', fontWeight: 500, fontSize: '0.95rem', color: '#475569' }}>
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/')}>Home</span>
           <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/templates')}>Templates</span>
-          <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/tools')}>Tools</span>
-          <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/help')}>Help</span>
         </nav>
       )}
 
       {/* Right: Auth / CTA */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        {isEditor ? (
+        {isEditor && (
           <>
             <button 
               onClick={handleResetLayout} 
@@ -123,15 +121,6 @@ export const Header: React.FC = () => {
               style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px' }}
             >
               <Printer size={18} /> Download PDF
-            </button>
-          </>
-        ) : (
-          <>
-            <button 
-              onClick={() => router.push('/dashboard')} 
-              style={{ background: '#ef4444', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}
-            >
-              Dashboard
             </button>
           </>
         )}

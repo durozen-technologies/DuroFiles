@@ -3,7 +3,7 @@
 ## Completed
 - [x] Next.js App Router initialization
 - [x] Real-time A4 PDF Preview & Print-to-PDF CSS rules
-- [x] Multi-page routing (`/dashboard`, `/invoice/[id]`)
+- [x] Multi-page routing (`/templates`, `/invoice/[id]`)
 - [x] Local Storage integration for saving multiple invoices
 - [x] Multi-template Engine (Modern, Classic, Creative)
 - [x] Structural Refactor: Split into `/frontend` and `/backend`

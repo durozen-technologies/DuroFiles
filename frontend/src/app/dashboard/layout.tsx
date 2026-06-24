@@ -33,10 +33,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const NavItem = ({ icon, label, path }: any) => {
     const isActive = pathname === path;
     return (
-      <div 
+      <div
         onClick={() => router.push(path)}
-        style={{ 
-          display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', 
+        style={{
+          display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px',
           borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s',
           background: isActive ? '#eff6ff' : 'transparent',
           color: isActive ? '#2563eb' : '#475569',
@@ -54,20 +54,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div style={{ flex: 1, display: 'flex', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
         {/* Sidebar Navigation */}
         <aside style={{ width: '260px', padding: '30px 20px', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          
+
           <button onClick={handleCreateNew} style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
             <Plus size={18} /> New Invoice
           </button>
 
-          <NavItem icon={<LayoutDashboard />} label="Overview" path="/dashboard" />
-          <NavItem icon={<FileText />} label="Invoices" path="/dashboard/invoices" />
-          <NavItem icon={<Users />} label="Clients" path="/dashboard/clients" />
-          <NavItem icon={<Package />} label="Products" path="/dashboard/products" />
-          
+          <NavItem icon={<LayoutDashboard />} label="Overview" path="/templates" />
+          <NavItem icon={<FileText />} label="Invoices" path="/templates/invoices" />
+          <NavItem icon={<Users />} label="Clients" path="/templates/clients" />
+          <NavItem icon={<Package />} label="Products" path="/templates/products" />
+
           <div style={{ margin: '20px 0', height: '1px', background: '#e2e8f0' }} />
-          
-          <NavItem icon={<Trash2 />} label="Trash" path="/dashboard/trash" />
-          <NavItem icon={<Settings />} label="Settings" path="/dashboard/settings" />
+
+          <NavItem icon={<Trash2 />} label="Trash" path="/templates/trash" />
+          <NavItem icon={<Settings />} label="Settings" path="/templates/settings" />
         </aside>
 
         {/* Main Content Area */}
