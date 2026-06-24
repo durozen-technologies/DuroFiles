@@ -7,18 +7,29 @@ export default function Templates() {
   const router = useRouter();
 
   const handleCreate = (template: string) => {
+    const generateId = () => {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return 'id-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    };
+
     const newInvoice = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       templateId: template.toLowerCase() as any,
       invoiceNumber: `INV-${Math.floor(Math.random() * 10000)}`,
       date: new Date().toISOString().split('T')[0],
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       countryOfSupply: 'India',
       currency: '₹',
+      logoUrl: '',
       billedBy: { name: '', address: '', gstin: '', pan: '', email: '', phone: '' },
       billedTo: { name: '', address: '', gstin: '', pan: '' },
-      items: [{ id: crypto.randomUUID(), description: 'Sample Item', hsn: '', gstRate: 18, quantity: 1, rate: 1000 }],
-      paymentDetails: { upiId: '' }
+      items: [{ id: generateId(), description: 'Sample Item', hsn: '', gstRate: 18, quantity: 1, rate: 1000 }],
+      paymentDetails: { upiId: '' },
+      notes: 'Thank you for your business!',
+      terms: 'Payment is due within 15 days. Late payments may incur a 1.5% monthly fee.',
+      hiddenFields: [] as string[],
     };
     const saved = localStorage.getItem('invoices_db');
     const invoices = saved ? JSON.parse(saved) : [];
@@ -51,7 +62,6 @@ export default function Templates() {
       
       <div style={{ padding: '60px 20px', textAlign: 'center', background: 'white', borderBottom: '1px solid #e2e8f0' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#0f172a', marginBottom: '16px' }}>Template Marketplace</h1>
-        <p style={{ fontSize: '1.1rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>Choose from our professionally designed, fully customizable templates.</p>
       </div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '60px 20px', width: '100%' }}>

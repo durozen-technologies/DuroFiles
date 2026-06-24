@@ -1,130 +1,206 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Printer, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+
+const NAV_LINKS = [
+  { label: 'Home',       href: '/' },
+  { label: 'Templates',  href: '/templates' },
+  { label: 'Contact Us', href: '/contact' },
+  { label: 'Feedback',   href: '/feedback' },
+];
 
 export const Header: React.FC = () => {
-  const router = useRouter();
+  const router   = useRouter();
   const pathname = usePathname();
-  
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
   const isEditor = pathname.startsWith('/invoice/');
 
-  const handleResetLayout = () => {
-    if (confirm("Are you sure you want to reset all dragged elements to their default positions?")) {
-      window.dispatchEvent(new CustomEvent('reset-layout'));
-    }
-  };
+  // Track screen size
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
-  const handleDownloadPDF = async () => {
-    try {
-      (document.activeElement as HTMLElement)?.blur();
-      
-      const element = document.querySelector('.a4-paper') as HTMLElement;
-      if (!element) {
-        window.print();
-        return;
-      }
-      
-      // Temporarily hide UI elements inside the paper
-      const hiddenElements = element.querySelectorAll('.print-hidden');
-      const originalDisplays: string[] = [];
-      hiddenElements.forEach((el, index) => {
-        originalDisplays[index] = (el as HTMLElement).style.display;
-        (el as HTMLElement).style.display = 'none';
-      });
+  // Close menu on route change
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
-      // Temporarily remove minHeight to prevent fractional pixel overflow causing a blank 2nd page
-      const originalMinHeight = element.style.getPropertyValue('min-height');
-      const originalHeight = element.style.getPropertyValue('height');
-      element.style.setProperty('min-height', '0px', 'important');
-      element.style.setProperty('height', 'max-content', 'important');
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
 
-      // Dynamically import libraries to avoid SSR issues
-      const html2canvas = (await import('html2canvas')).default;
-      const { jsPDF } = await import('jspdf');
+  if (isEditor) return null;
 
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      let finalWidth = pdfWidth;
-      let finalHeight = (canvas.height * finalWidth) / canvas.width;
-      
-      // Force it to fit on exactly ONE page by scaling it down if it's too tall
-      if (finalHeight > 297) {
-        const ratio = 297 / finalHeight;
-        finalHeight = 297;
-        finalWidth = finalWidth * ratio;
-      }
-      
-      const xOffset = (pdfWidth - finalWidth) / 2;
-      pdf.addImage(imgData, 'JPEG', xOffset, 0, finalWidth, finalHeight);
-      pdf.save(`Invoice_${new Date().toISOString().split('T')[0]}.pdf`);
-
-      // Restore UI elements and styles
-      if (originalMinHeight) element.style.setProperty('min-height', originalMinHeight); else element.style.removeProperty('min-height');
-      if (originalHeight) element.style.setProperty('height', originalHeight); else element.style.removeProperty('height');
-      hiddenElements.forEach((el, index) => {
-        (el as HTMLElement).style.display = originalDisplays[index];
-      });
-    } catch (error) {
-      console.error("Failed to generate PDF:", error);
-      window.print();
-    }
+  const navigate = (href: string) => {
+    router.push(href);
+    setMenuOpen(false);
   };
 
   return (
-    <header className="print-hidden" style={{ padding: '0 30px', height: '70px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', borderBottom: '1px solid #eaeaea', position: 'sticky', top: 0, zIndex: 100 }}>
-      {/* Left: Logo or Breadcrumb */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => router.push('/')}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/logo.png" alt="DuroFiles Logo" style={{ height: '125px' }} />
-          </div>
+    <>
+      <header
+        className="print-hidden"
+        style={{
+          padding: '0 30px',
+          height: '70px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: 'white',
+          borderBottom: '1px solid #eaeaea',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+        }}
+      >
+        {/* Left: Logo */}
+        <div
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+          onClick={() => navigate('/')}
+        >
+          <img src="/logo.png" alt="DuroFiles Logo" style={{ height: '125px' }} />
         </div>
 
-        {isEditor && (
-          <>
-            <div style={{ width: '1px', height: '24px', background: '#cbd5e1' }} />
-            <button 
-              onClick={() => router.push('/templates')}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#64748b', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}
-            >
-              <ArrowLeft size={16} /> Back
-            </button>
-          </>
+        {/* Center: Desktop nav */}
+        {!isMobile && (
+          <nav style={{ display: 'flex', gap: '24px', alignItems: 'center', fontWeight: 500, fontSize: '0.95rem', color: '#475569' }}>
+            {NAV_LINKS.map(link => (
+              <span
+                key={link.href}
+                onClick={() => navigate(link.href)}
+                style={{
+                  cursor: 'pointer',
+                  transition: 'color 0.2s',
+                  color: pathname === link.href ? '#2563eb' : '#475569',
+                  fontWeight: pathname === link.href ? 700 : 500,
+                }}
+              >
+                {link.label}
+              </span>
+            ))}
+          </nav>
         )}
-      </div>
 
-      {/* Center: Global Navigation */}
-      {!isEditor && (
-        <nav style={{ display: 'flex', gap: '24px', alignItems: 'center', fontWeight: 500, fontSize: '0.95rem', color: '#475569' }}>
-          <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/')}>Home</span>
-          <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onClick={() => router.push('/templates')}>Templates</span>
-        </nav>
+        {/* Right: Hamburger (mobile only) */}
+        {isMobile && (
+          <button
+            onClick={() => setMenuOpen(prev => !prev)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px',
+              borderRadius: '8px',
+              color: '#0f172a',
+              transition: 'background 0.2s',
+            }}
+          >
+            {menuOpen ? <X size={26} /> : <Menu size={26} />}
+          </button>
+        )}
+
+        {/* Spacer for desktop balance */}
+        {!isMobile && <div style={{ width: '125px' }} />}
+      </header>
+
+      {/* Mobile Drawer — slides in from right */}
+      {isMobile && (
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={() => setMenuOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.35)',
+              zIndex: 200,
+              opacity: menuOpen ? 1 : 0,
+              pointerEvents: menuOpen ? 'all' : 'none',
+              transition: 'opacity 0.25s ease',
+            }}
+          />
+
+          {/* Drawer panel */}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              height: '100dvh',
+              width: '260px',
+              background: 'white',
+              boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',
+              zIndex: 300,
+              display: 'flex',
+              flexDirection: 'column',
+              transform: menuOpen ? 'translateX(0)' : 'translateX(100%)',
+              transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            {/* Drawer header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '16px 20px',
+              borderBottom: '1px solid #f1f5f9',
+            }}>
+              <img src="/logo.png" alt="DuroFiles" style={{ height: '60px' }} />
+              <button
+                onClick={() => setMenuOpen(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '4px' }}
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Nav links */}
+            <nav style={{ display: 'flex', flexDirection: 'column', padding: '16px 0', flex: 1 }}>
+              {NAV_LINKS.map(link => (
+                <button
+                  key={link.href}
+                  onClick={() => navigate(link.href)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '14px 24px',
+                    background: pathname === link.href ? '#eff6ff' : 'none',
+                    border: 'none',
+                    borderLeft: pathname === link.href ? '3px solid #2563eb' : '3px solid transparent',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    fontWeight: pathname === link.href ? 700 : 500,
+                    color: pathname === link.href ? '#2563eb' : '#334155',
+                    textAlign: 'left',
+                    width: '100%',
+                    transition: 'background 0.15s',
+                  }}
+                >
+                  {link.label}
+                </button>
+              ))}
+            </nav>
+
+            {/* Footer */}
+            <div style={{ padding: '20px 24px', borderTop: '1px solid #f1f5f9' }}>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#94a3b8' }}>
+                © {new Date().getFullYear()} Durozen Technologies
+              </p>
+            </div>
+          </div>
+        </>
       )}
-
-      {/* Right: Auth / CTA */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        {isEditor && (
-          <>
-            <button 
-              onClick={handleResetLayout} 
-              style={{ background: 'none', color: '#64748b', border: '1px solid #cbd5e1', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-            >
-              <RefreshCw size={14} /> Reset Layout
-            </button>
-            <button 
-              onClick={handleDownloadPDF} 
-              className="btn"
-              style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px' }}
-            >
-              <Printer size={18} /> Download PDF
-            </button>
-          </>
-        )}
-      </div>
-    </header>
+    </>
   );
 };

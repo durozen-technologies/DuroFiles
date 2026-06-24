@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Header } from "../components/Header";
 import { Geist } from "next/font/google";
@@ -6,35 +6,76 @@ import { cn } from "../lib/utils";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
+// ── Viewport (theme colour, mobile) ──────────────────────────────────────────
+export const viewport: Viewport = {
+  themeColor: '#863bff',
+  width: 'device-width',
+  initialScale: 1,
+};
+
+// ── Site-wide SEO defaults (overridden per page via generateMetadata) ─────────
 export const metadata: Metadata = {
-  metadataBase: new URL('https://durofiles.com'),
-  title: "DuroFiles - Free Professional Invoice Generator",
-  description: "Create, customize, and download beautiful PDF invoices in seconds. No sign-up required. Choose from multiple professional templates.",
-  keywords: "invoice generator, free invoice maker, pdf invoice, business invoice, billing software, gst invoice, receipt maker",
-  authors: [{ name: "DuroFiles" }],
-  creator: "DuroFiles",
+  metadataBase: new URL('https://durofiles.durozen.in'),
+
+  // Title template: page-specific | DuroFiles
+  title: {
+    default: 'DuroFiles — Free Professional Invoice Generator',
+    template: '%s | DuroFiles',
+  },
+  description:
+    'Create, customise, and download beautiful PDF invoices in seconds. No sign-up required. GST-ready templates for freelancers and businesses.',
+  keywords: [
+    'invoice generator', 'free invoice maker', 'pdf invoice', 'business invoice',
+    'billing software', 'gst invoice', 'receipt maker', 'durofiles',
+  ],
+  authors: [{ name: 'Durozen Technologies', url: 'https://durozen.in' }],
+  creator: 'Durozen Technologies',
+  publisher: 'Durozen Technologies',
+
+  // ── Favicon / Icons ─────────────────────────────────────────────────────────
+  icons: {
+    icon: [
+      { url: '/logo.png', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/logo.png',
+  },
+  manifest: '/site.webmanifest',
+
+  // ── Open Graph ───────────────────────────────────────────────────────────────
   openGraph: {
-    title: "DuroFiles - Free Professional Invoice Generator",
-    description: "Create, customize, and download beautiful PDF invoices in seconds. No sign-up required.",
-    url: 'https://durofiles.com',
+    title: 'DuroFiles — Free Professional Invoice Generator',
+    description:
+      'Create, customise, and download beautiful PDF invoices in seconds. No sign-up required.',
+    url: 'https://durofiles.durozen.in',
     siteName: 'DuroFiles',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'DuroFiles Invoice Generator',
+        alt: 'DuroFiles — Free Professional Invoice Generator',
       },
     ],
     locale: 'en_US',
-    type: "website",
+    type: 'website',
   },
+
+  // ── Twitter / X ──────────────────────────────────────────────────────────────
   twitter: {
     card: 'summary_large_image',
-    title: "DuroFiles - Free Professional Invoice Generator",
-    description: "Create, customize, and download beautiful PDF invoices in seconds.",
-    images: ['/og-image.jpg'],
+    title: 'DuroFiles — Free Professional Invoice Generator',
+    description: 'Create, customise, and download beautiful PDF invoices in seconds.',
+    images: ['/og-image.png'],
+    site: '@durofiles',
+    creator: '@durofiles',
   },
+
+  // ── Robots ───────────────────────────────────────────────────────────────────
   robots: {
     index: true,
     follow: true,
@@ -46,6 +87,15 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+
+  // ── Canonical ─────────────────────────────────────────────────────────────────
+  alternates: {
+    canonical: 'https://durofiles.durozen.in',
+  },
+
+  // ── App info ─────────────────────────────────────────────────────────────────
+  applicationName: 'DuroFiles',
+  category: 'business',
 };
 
 export default function RootLayout({

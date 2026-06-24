@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { InvoiceData } from '../../types/invoice';
 import { useEditor } from '../contexts/EditorContext';
-import { Eye, EyeOff, Layers, Settings } from 'lucide-react';
+import { Eye, EyeOff, Layers, Settings, Printer, ArrowLeft, RefreshCw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   data: InvoiceData;
@@ -11,8 +12,74 @@ interface Props {
 export const SettingsToolbar: React.FC<Props> = ({ data, onChange }) => {
   const { isDragMode, setIsDragMode } = useEditor();
   const [showMenu, setShowMenu] = useState(false);
+  const router = useRouter();
 
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleResetLayout = () => {
+    if (confirm("Are you sure you want to reset all dragged elements to their default positions?")) {
+      window.dispatchEvent(new CustomEvent('reset-layout'));
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      (document.activeElement as HTMLElement)?.blur();
+      
+      const element = document.querySelector('.a4-paper') as HTMLElement;
+      if (!element) {
+        window.print();
+        return;
+      }
+      
+      // Temporarily hide UI elements inside the paper
+      const hiddenElements = element.querySelectorAll('.print-hidden');
+      const originalDisplays: string[] = [];
+      hiddenElements.forEach((el, index) => {
+        originalDisplays[index] = (el as HTMLElement).style.display;
+        (el as HTMLElement).style.display = 'none';
+      });
+
+      // Temporarily remove minHeight to prevent fractional pixel overflow causing a blank 2nd page
+      const originalMinHeight = element.style.getPropertyValue('min-height');
+      const originalHeight = element.style.getPropertyValue('height');
+      element.style.setProperty('min-height', '0px', 'important');
+      element.style.setProperty('height', 'max-content', 'important');
+
+      // Dynamically import libraries to avoid SSR issues
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      let finalWidth = pdfWidth;
+      let finalHeight = (canvas.height * finalWidth) / canvas.width;
+      
+      // Force it to fit on exactly ONE page by scaling it down if it's too tall
+      if (finalHeight > 297) {
+        const ratio = 297 / finalHeight;
+        finalHeight = 297;
+        finalWidth = finalWidth * ratio;
+      }
+      
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      pdf.addImage(imgData, 'JPEG', xOffset, 0, finalWidth, finalHeight);
+      pdf.save(`Invoice_${new Date().toISOString().split('T')[0]}.pdf`);
+
+      // Restore UI elements and styles
+      if (originalMinHeight) element.style.setProperty('min-height', originalMinHeight); else element.style.removeProperty('min-height');
+      if (originalHeight) element.style.setProperty('height', originalHeight); else element.style.removeProperty('height');
+      hiddenElements.forEach((el, index) => {
+        (el as HTMLElement).style.display = originalDisplays[index];
+      });
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+      window.print();
+    }
+  };
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -35,11 +102,10 @@ export const SettingsToolbar: React.FC<Props> = ({ data, onChange }) => {
 
   return (
     <div className="settings-toolbar print-hidden" ref={menuRef} style={{
-      position: 'fixed',
-      top: '90px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      zIndex: 1000,
+      position: 'relative',
+      marginTop: '30px',
+      marginBottom: '10px',
+      zIndex: 10,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center'
@@ -55,35 +121,21 @@ export const SettingsToolbar: React.FC<Props> = ({ data, onChange }) => {
         borderRadius: '30px',
         boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
         border: '1px solid var(--border-color)',
+        flexWrap: 'wrap',
+        justifyContent: 'center'
       }}>
 
-        {/* Template Selector - OUTSIDE Settings */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '8px' }}>
-          <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)' }}>Template:</label>
-          <select
-            value={data.templateId || 'modern'}
-            onChange={e => onChange({ ...data, templateId: e.target.value as any })}
-            style={{
-              padding: '6px 12px',
-              borderRadius: '20px',
-              border: '1px solid var(--border-color)',
-              fontSize: '0.875rem',
-              outline: 'none',
-              backgroundColor: '#f8fafc',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="modern">Modern</option>
-            <option value="classic">Classic</option>
-            <option value="creative">Creative</option>
-            <option value="tech">Tech</option>
-            <option value="gst_standard">GST Standard</option>
-            <option value="amazon_style">Amazon</option>
-            <option value="instagram_style">Instagram</option>
-          </select>
-        </div>
+        {/* Back Button */}
+        <button 
+          onClick={() => router.push('/templates')}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#64748b', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}
+        >
+          <ArrowLeft size={16} /> Back
+        </button>
 
         <div style={{ width: '1px', height: '20px', backgroundColor: 'var(--border-color)' }}></div>
+
+
 
         {/* Settings Pill Button */}
         <button
@@ -104,6 +156,26 @@ export const SettingsToolbar: React.FC<Props> = ({ data, onChange }) => {
           }}
         >
           <Settings size={18} /> Settings
+        </button>
+
+        <div style={{ width: '1px', height: '20px', backgroundColor: 'var(--border-color)' }}></div>
+
+        {/* Reset Layout */}
+        <button 
+          onClick={handleResetLayout} 
+          style={{ background: 'none', color: '#64748b', border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+          <RefreshCw size={14} /> Reset
+        </button>
+
+        <div style={{ width: '1px', height: '20px', backgroundColor: 'var(--border-color)' }}></div>
+
+        {/* Download PDF */}
+        <button 
+          onClick={handleDownloadPDF} 
+          style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '20px', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+          <Printer size={16} /> Download PDF
         </button>
 
       </div>
@@ -178,6 +250,27 @@ export const SettingsToolbar: React.FC<Props> = ({ data, onChange }) => {
                 <option value="CGST_SGST">CGST+SGST</option>
               </select>
             </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+              <label style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 700, color: '#64748b' }}>GST %</label>
+              <select
+                value={data.items?.[0]?.gstRate || 0}
+                onChange={e => {
+                  const newRate = parseFloat(e.target.value) || 0;
+                  onChange({
+                    ...data,
+                    items: data.items.map(item => ({ ...item, gstRate: newRate }))
+                  });
+                }}
+                style={{ padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.8rem', outline: 'none', backgroundColor: '#f8fafc', width: '100%' }}
+              >
+                <option value="0">0%</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18">18%</option>
+                <option value="28">28%</option>
+              </select>
+            </div>
           </div>
 
           <div style={{ height: '1px', backgroundColor: 'var(--border-color)', margin: '2px 0' }}></div>
@@ -198,6 +291,7 @@ export const SettingsToolbar: React.FC<Props> = ({ data, onChange }) => {
             }}>
               {[
                 { id: 'logo', label: 'Logo' },
+                { id: 'gst', label: 'GST Tax & Number' },
                 { id: 'billTo', label: 'Bill To' },
                 { id: 'shipTo', label: 'Ship To' },
                 { id: 'invoiceNo', label: 'Invoice #' },

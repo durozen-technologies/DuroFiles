@@ -19,7 +19,10 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
     return data.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
   };
 
+  const showGst = !data.hiddenFields?.includes('gst');
+
   const calculateTotalIGST = () => {
+    if (!showGst) return 0;
     return data.items.reduce((sum, item) => {
       const amount = item.quantity * item.rate;
       return sum + (amount * ((item.gstRate || 0) / 100));
@@ -43,8 +46,16 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
         <DraggableBlock id="ig_header_left" data={data} onChange={onChange}>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
             {!data.hiddenFields?.includes('logo') && (
-              <EditableImage src={data.logoUrl || ''} onChange={(v) => onChange?.({ ...data, logoUrl: v })} style={{ maxWidth: '160px', maxHeight: '45px', objectFit: 'contain', marginBottom: '10px', borderRadius: '4px' }} fallbackText="Logo" />
+              <DraggableBlock id="header_logo" data={data} onChange={onChange}>
+                <EditableImage
+                  src={data.logoUrl || ''}
+                  onChange={(src) => onChange?.({ ...data, logoUrl: src })}
+                  fallbackText="Upload Logo"
+                  style={{ width: '100px', height: '50px', marginBottom: '10px' }}
+                />
+              </DraggableBlock>
             )}
+
             <h1 style={{ fontSize: '12px', margin: '0', textTransform: 'uppercase', letterSpacing: '2px', color: '#000' }}>Invoice</h1>
           </div>
         </DraggableBlock>
@@ -52,7 +63,7 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
         <DraggableBlock id="ig_header_right" data={data} onChange={onChange}>
           <div style={{ textAlign: 'right' }}>
             <h2 style={{ fontSize: '22px', margin: '0 0 5px 0', color: '#000' }}><EditableValue value={data.billedBy.name} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, name: v } })} placeholder="Your Company Name" /></h2>
-            {data.billedBy.gstin && <p style={{ margin: '2px 0' }}><strong>GSTIN <EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, gstin: v } })} placeholder="GSTIN" /></strong></p>}
+            {showGst && <p style={{ margin: '2px 0' }}><strong>GSTIN <EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, gstin: v } })} placeholder="GSTIN" /></strong></p>}
             <p style={{ margin: '2px 0', whiteSpace: 'pre-wrap' }}><EditableValue isTextArea value={data.billedBy.address} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, address: v } })} placeholder="Your Address" /></p>
             <p style={{ margin: '2px 0' }}>
               {data.billedBy.phone && <><strong>Mobile</strong> <EditableValue value={data.billedBy.phone} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, phone: v } })} placeholder="Phone" /> &nbsp;</>}
@@ -69,7 +80,6 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
             <div>
               <div style={{ fontWeight: 'bold', color: '#555', marginBottom: '2px' }}>Bill To:</div>
               <p style={{ margin: '2px 0' }}><strong><EditableValue value={data.billedTo.name} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, name: v } })} placeholder="Client Name" /></strong></p>
-              {data.billedTo.gstin && <p style={{ margin: '2px 0' }}><strong><EditableLabel id="lbl_gstin" defaultText="GSTIN: " data={data} onChange={onChange} /><EditableValue value={data.billedTo.gstin} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, gstin: v } })} placeholder="GSTIN" /></strong></p>}
               {data.billedTo.phone && <p style={{ margin: '2px 0' }}>Ph: {data.billedTo.phone}</p>}
               <p style={{ margin: '2px 0', whiteSpace: 'pre-wrap' }}><EditableValue isTextArea value={data.billedTo.address} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, address: v } })} placeholder="Client Address" /></p>
             </div>
@@ -194,22 +204,24 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
                 <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>Amount</td>
                 <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{subtotal.toFixed(2)}</td>
               </tr>
-              {isIGST ? (
-                <tr>
-                  <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>IGST</td>
-                  <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{totalTax.toFixed(2)}</td>
-                </tr>
-              ) : (
-                <>
+              {showGst && (
+                isIGST ? (
                   <tr>
-                    <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>CGST</td>
-                    <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{(totalTax / 2).toFixed(2)}</td>
+                    <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>IGST</td>
+                    <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{totalTax.toFixed(2)}</td>
                   </tr>
-                  <tr>
-                    <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>SGST</td>
-                    <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{(totalTax / 2).toFixed(2)}</td>
-                  </tr>
-                </>
+                ) : (
+                  <>
+                    <tr>
+                      <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>CGST</td>
+                      <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{(totalTax / 2).toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>SGST</td>
+                      <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{(totalTax / 2).toFixed(2)}</td>
+                    </tr>
+                  </>
+                )
               )}
               <tr>
                 <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>Round Off</td>

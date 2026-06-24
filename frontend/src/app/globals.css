@@ -40,7 +40,7 @@ body {
 .app-container {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  /* overflow: hidden removed to allow native scroll */
 }
 
 .sidebar {
@@ -56,11 +56,10 @@ body {
 .preview-container {
   flex: 1;
   background-color: #f1f5f9;
-  padding: 80px 40px 40px 40px;
-  overflow-y: auto;
+  padding: 40px; /* Adjusted padding */
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Premium Form Styling */
@@ -579,24 +578,21 @@ body {
     gap: 10px !important;
     padding: 10px 15px !important;
     border-radius: 16px !important;
-    top: 80px !important;
   }
 
   .preview-container {
-    padding: 170px 0px 40px 0px !important;
-    /* Extra padding for the wrapped toolbar */
+    padding: 4px !important;
     justify-content: flex-start !important;
     overflow-x: auto;
     width: 100vw;
   }
 
-  /* On mobile, keep the a4-paper its original width, and allow horizontal scrolling. 
-     This prevents the invoice content from squishing and breaking the layout. */
   .a4-paper {
-    width: 210mm !important;
+    /* Retain A4 dimensions on mobile but allow horizontal scrolling */
     min-width: 210mm !important;
-    transform-origin: top left;
-    margin: 0 auto;
+    width: 210mm !important;
+    padding: 20mm !important; 
+    margin: 0 auto !important;
   }
 
   .invoice-table-wrapper {

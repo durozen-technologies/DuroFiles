@@ -42,10 +42,10 @@ export default function InvoiceEditor() {
 
   return (
     <EditorProvider>
-      <div className="app-container" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <SettingsToolbar data={data} onChange={setData} />
-        <div className="preview-container" style={{ flex: 1, padding: '100px 40px 40px 40px', display: 'flex', justifyContent: 'center' }}>
-          <div style={{ position: 'relative', width: '210mm', flexShrink: 0 }}>
+        <div className="preview-container">
+          <div style={{ position: 'relative', flexShrink: 0, maxWidth: '100%' }}>
             <InvoicePreview data={data} onChange={setData} />
           </div>
         </div>

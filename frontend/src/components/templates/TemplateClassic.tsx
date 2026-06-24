@@ -16,7 +16,10 @@ export const TemplateClassic: React.FC<Props> = ({ data, onChange }) => {
     return data.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
   };
 
+  const showGst = !data.hiddenFields?.includes('gst');
+
   const calculateIGST = () => {
+    if (!showGst) return 0;
     return data.items.reduce((sum, item) => {
       const amount = item.quantity * item.rate;
       return sum + (amount * (item.gstRate / 100));
@@ -48,12 +51,22 @@ export const TemplateClassic: React.FC<Props> = ({ data, onChange }) => {
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <DraggableBlock id="header_logo" data={data} onChange={onChange}><EditableImage src={data.logoUrl || ''} onChange={(v) => onChange?.({ ...data, logoUrl: v })} style={{ maxHeight: '80px', maxWidth: '200px', objectFit: 'contain', marginBottom: '10px' }} /></DraggableBlock>
+            {!data.hiddenFields?.includes('logo') && (
+              <DraggableBlock id="header_logo" data={data} onChange={onChange}>
+                <EditableImage
+                  src={data.logoUrl || ''}
+                  onChange={(src) => onChange?.({ ...data, logoUrl: src })}
+                  fallbackText="Upload Logo"
+                  style={{ width: '120px', height: '60px', marginLeft: 'auto', marginBottom: '8px' }}
+                />
+              </DraggableBlock>
+            )}
+
             <DraggableBlock id="billedBy_name" data={data} onChange={onChange}><h2 style={{ fontSize: '1.25rem', margin: 0 }}><EditableValue value={data.billedBy.name} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, name: v } })} placeholder="Your Company Name" /></h2></DraggableBlock>
             <DraggableBlock id="billedBy_address" data={data} onChange={onChange}><p style={{ whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}><EditableValue isTextArea value={data.billedBy.address} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, address: v } })} placeholder="Your Address" /></p></DraggableBlock>
             {data.billedBy.phone && <DraggableBlock id="billedBy_phone" data={data} onChange={onChange}><p style={{ fontSize: '0.9rem' }}><EditableLabel id="lbl_phone" defaultText="Tel: " data={data} onChange={onChange} /><EditableValue value={data.billedBy.phone} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, phone: v } })} placeholder="Phone" /></p></DraggableBlock>}
             {data.billedBy.email && <DraggableBlock id="billedBy_email" data={data} onChange={onChange}><p style={{ fontSize: '0.9rem' }}><EditableLabel id="lbl_email" defaultText="Email: " data={data} onChange={onChange} /><EditableValue value={data.billedBy.email} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, email: v } })} placeholder="Email" /></p></DraggableBlock>}
-            {data.billedBy.gstin && <DraggableBlock id="billedBy_gstin" data={data} onChange={onChange}><p style={{ fontSize: '0.9rem' }}><EditableLabel id="lbl_gstin" defaultText="GSTIN: " data={data} onChange={onChange} /><EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, gstin: v } })} placeholder="GSTIN" /></p></DraggableBlock>}
+            {showGst && <DraggableBlock id="billedBy_gstin" data={data} onChange={onChange}><p style={{ fontSize: '0.9rem' }}><EditableLabel id="lbl_gstin" defaultText="GSTIN: " data={data} onChange={onChange} /><EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({ ...data, billedBy: { ...data.billedBy, gstin: v } })} placeholder="GSTIN" /></p></DraggableBlock>}
           </div>
         </div>
       </DraggableBlock>
@@ -64,7 +77,6 @@ export const TemplateClassic: React.FC<Props> = ({ data, onChange }) => {
             <DraggableBlock id="billedTo_title" data={data} onChange={onChange}><h3 style={{ borderBottom: '1px solid #ccc', paddingBottom: '5px', marginBottom: '10px' }}><EditableLabel id="lbl_billedTo" defaultText="Bill To:" data={data} onChange={onChange} /></h3></DraggableBlock>
             <DraggableBlock id="billedTo_name" data={data} onChange={onChange}><p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}><EditableValue value={data.billedTo.name} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, name: v } })} placeholder="Client Name" /></p></DraggableBlock>
             <DraggableBlock id="billedTo_address" data={data} onChange={onChange}><p style={{ whiteSpace: 'pre-wrap' }}><EditableValue isTextArea value={data.billedTo.address} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, address: v } })} placeholder="Client Address" /></p></DraggableBlock>
-            {data.billedTo.gstin && <DraggableBlock id="billedTo_gstin" data={data} onChange={onChange}><p><EditableLabel id="lbl_gstin" defaultText="GSTIN: " data={data} onChange={onChange} /><EditableValue value={data.billedTo.gstin} onChange={(v) => onChange?.({ ...data, billedTo: { ...data.billedTo, gstin: v } })} placeholder="GSTIN" /></p></DraggableBlock>}
           </div>
         </DraggableBlock>
         {data.countryOfSupply && !data.hiddenFields?.includes('placeOfSupply') && (
@@ -84,14 +96,14 @@ export const TemplateClassic: React.FC<Props> = ({ data, onChange }) => {
               <th style={{ padding: '10px', textAlign: 'center' }}><EditableLabel id="lbl_col_hsn" defaultText="HSN" data={data} onChange={onChange} /></th>
               <th style={{ padding: '10px', textAlign: 'center' }}><EditableLabel id="lbl_col_qty" defaultText="Qty" data={data} onChange={onChange} /></th>
               <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_rate" defaultText="Rate" data={data} onChange={onChange} /></th>
-              <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_gst" defaultText="GST" data={data} onChange={onChange} /></th>
+              {showGst && <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_gst" defaultText="GST" data={data} onChange={onChange} /></th>}
               <th style={{ padding: '10px', textAlign: 'right' }}><EditableLabel id="lbl_col_total" defaultText="Total" data={data} onChange={onChange} /></th>
             </tr>
           </thead>
           <tbody>
             {data.items.length === 0 && (
                <tr>
-                 <td colSpan={6} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
+                 <td colSpan={showGst ? 6 : 5} style={{ textAlign: 'center', color: '#9ca3af', padding: '30px' }}>
                     <div style={{ marginBottom: '10px' }}>No items added yet</div>
                     {onChange && (
                       <button 
@@ -120,14 +132,14 @@ export const TemplateClassic: React.FC<Props> = ({ data, onChange }) => {
                   <td style={{ padding: '10px', textAlign: 'center' }}><EditableValue value={item.hsn} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, hsn: v }; onChange?.({ ...data, items: newItems }) }} placeholder="HSN" /></td>
                   <td style={{ padding: '10px', textAlign: 'center' }}><EditableValue value={item.quantity.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, quantity: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
                   <td style={{ padding: '10px', textAlign: 'right' }}>{data.currency || '₹'}<EditableValue value={item.rate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, rate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
-                  <td style={{ padding: '10px', textAlign: 'right' }}><EditableValue value={item.gstRate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, gstRate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" />%</td>
+                  {showGst && <td style={{ padding: '10px', textAlign: 'right' }}><EditableValue value={item.gstRate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, gstRate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" />%</td>}
                   <td style={{ padding: '10px', textAlign: 'right' }}>{data.currency || '₹'}<EditableValue value={total.toFixed(2)} onChange={(v) => { const newItems = [...data.items]; const newTotal = parseFloat(v) || 0; const newAmt = newTotal / (1 + (item.gstRate || 0) / 100); newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
                 </tr>
               );
             })}
             {data.items.length > 0 && onChange && (
               <tr className="print-hidden">
-                <td colSpan={7} style={{ textAlign: 'center', padding: '10px' }}>
+                <td colSpan={showGst ? 6 : 5} style={{ textAlign: 'center', padding: '10px' }}>
                   <button
                     className="add-item-btn"
                     onClick={() => onChange({ ...data, items: [...data.items, { id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }] })}
@@ -174,10 +186,12 @@ export const TemplateClassic: React.FC<Props> = ({ data, onChange }) => {
                   <td style={{ padding: '5px 10px', textAlign: 'right' }}><DraggableBlock id="totals_subLabel" data={data} onChange={onChange}><span><EditableLabel id="lbl_tot_amount" defaultText="Subtotal:" data={data} onChange={onChange} /></span></DraggableBlock></td>
                   <td style={{ padding: '5px 10px', textAlign: 'right' }}><DraggableBlock id="totals_subVal" data={data} onChange={onChange}><span>{data.currency || '₹'}{subtotal.toFixed(2)}</span></DraggableBlock></td>
                 </tr>
-                <tr>
-                  <td style={{ padding: '5px 10px', textAlign: 'right' }}><DraggableBlock id="totals_igstLabel" data={data} onChange={onChange}><span><EditableLabel id="lbl_tot_igst" defaultText="IGST:" data={data} onChange={onChange} /></span></DraggableBlock></td>
-                  <td style={{ padding: '5px 10px', textAlign: 'right' }}><DraggableBlock id="totals_igstVal" data={data} onChange={onChange}><span>{data.currency || '₹'}{igst.toFixed(2)}</span></DraggableBlock></td>
-                </tr>
+                {showGst && (
+                  <tr>
+                    <td style={{ padding: '5px 10px', textAlign: 'right' }}><DraggableBlock id="totals_igstLabel" data={data} onChange={onChange}><span><EditableLabel id="lbl_tot_igst" defaultText="IGST:" data={data} onChange={onChange} /></span></DraggableBlock></td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right' }}><DraggableBlock id="totals_igstVal" data={data} onChange={onChange}><span>{data.currency || '₹'}{igst.toFixed(2)}</span></DraggableBlock></td>
+                  </tr>
+                )}
                 <tr style={{ borderTop: '2px solid #000', fontWeight: 'bold', fontSize: '1.2rem' }}>
                   <td style={{ padding: '10px', textAlign: 'right' }}><DraggableBlock id="totals_grandLabel" data={data} onChange={onChange}><span><EditableLabel id="lbl_tot_total" defaultText="Total:" data={data} onChange={onChange} /></span></DraggableBlock></td>
                   <td style={{ padding: '10px', textAlign: 'right' }}><DraggableBlock id="totals_grandVal" data={data} onChange={onChange}><span>{data.currency || '₹'}{grandTotal.toFixed(2)}</span></DraggableBlock></td>

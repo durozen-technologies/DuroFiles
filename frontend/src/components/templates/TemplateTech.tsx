@@ -12,10 +12,12 @@ interface Props {
 }
 
 export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
+  const showGst = !data.hiddenFields?.includes('gst');
+
   const calculateTotal = () => {
     return data.items.reduce((sum, item) => {
       const amount = item.quantity * item.rate;
-      const igst = amount * (item.gstRate / 100);
+      const igst = showGst ? amount * (item.gstRate / 100) : 0;
       return sum + amount + igst;
     }, 0);
   };
@@ -62,7 +64,7 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
             <DraggableBlock id="billedBy_email" data={data} onChange={onChange}><p style={{ margin: 0 }}><EditableValue value={data.billedBy.email} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, email: v}})} placeholder="Email" /></p></DraggableBlock>
             <DraggableBlock id="billedBy_address" data={data} onChange={onChange}><p style={{ margin: 0, whiteSpace: 'pre-wrap' }}><EditableValue isTextArea value={data.billedBy.address} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, address: v}})} placeholder="Your Address" /></p></DraggableBlock>
             <DraggableBlock id="billedBy_phone" data={data} onChange={onChange}><p style={{ margin: 0 }}><EditableValue value={data.billedBy.phone} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, phone: v}})} placeholder="Phone" /></p></DraggableBlock>
-            <DraggableBlock id="billedBy_gstin" data={data} onChange={onChange}><p style={{ margin: 0 }}><EditableLabel id="lbl_gstin" defaultText="GSTIN: " data={data} onChange={onChange} /><EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, gstin: v}})} placeholder="GSTIN" /> | PAN: <EditableValue value={data.billedBy.pan} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, pan: v}})} placeholder="PAN" /></p></DraggableBlock>
+            {showGst && <DraggableBlock id="billedBy_gstin" data={data} onChange={onChange}><p style={{ margin: 0 }}><EditableLabel id="lbl_gstin" defaultText="GSTIN: " data={data} onChange={onChange} /><EditableValue value={data.billedBy.gstin} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, gstin: v}})} placeholder="GSTIN" /> | PAN: <EditableValue value={data.billedBy.pan} onChange={(v) => onChange?.({...data, billedBy: {...data.billedBy, pan: v}})} placeholder="PAN" /></p></DraggableBlock>}
           </div>
         </DraggableBlock>
       </div>
@@ -73,7 +75,16 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
         <DraggableBlock id="header" data={data} onChange={onChange}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
             <div>
-               <DraggableBlock id="header_logo" data={data} onChange={onChange}><EditableImage src={data.logoUrl || ''} onChange={(v) => onChange?.({...data, logoUrl: v})} style={{ maxHeight: '60px', objectFit: 'contain', marginBottom: '20px' }} /></DraggableBlock>
+              {!data.hiddenFields?.includes('logo') && (
+                <DraggableBlock id="header_logo" data={data} onChange={onChange}>
+                  <EditableImage
+                    src={data.logoUrl || ''}
+                    onChange={(src) => onChange?.({ ...data, logoUrl: src })}
+                    fallbackText="Upload Logo"
+                    style={{ width: '120px', height: '60px' }}
+                  />
+                </DraggableBlock>
+              )}
             </div>
             <div style={{ textAlign: 'right' }}>
               <DraggableBlock id="header_title" data={data} onChange={onChange}><h1 style={{ fontSize: '3.5rem', fontWeight: 600, color: '#1f584f', margin: '0 0 20px 0', letterSpacing: '2px' }}><EditableLabel id="lbl_invoice" defaultText="INVOICE" data={data} onChange={onChange} /></h1></DraggableBlock>
@@ -88,7 +99,6 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
               <DraggableBlock id="billedTo_title" data={data} onChange={onChange}><h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '8px', color: '#111' }}>ISSUED TO:</h3></DraggableBlock>
               <DraggableBlock id="billedTo_name" data={data} onChange={onChange}><p style={{ fontWeight: 600, margin: '0 0 4px 0', color: '#111' }}><EditableValue value={data.billedTo.name} onChange={(v) => onChange?.({...data, billedTo: {...data.billedTo, name: v}})} placeholder="Client Name" /></p></DraggableBlock>
               <DraggableBlock id="billedTo_address" data={data} onChange={onChange}><p style={{ margin: '0 0 4px 0', color: '#444', whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}><EditableValue isTextArea value={data.billedTo.address} onChange={(v) => onChange?.({...data, billedTo: {...data.billedTo, address: v}})} placeholder="Client Address" /></p></DraggableBlock>
-              {data.billedTo.gstin && <DraggableBlock id="billedTo_gstin" data={data} onChange={onChange}><p style={{ margin: 0, color: '#444', fontSize: '0.9rem' }}><EditableLabel id="lbl_gstin" defaultText="GSTIN: " data={data} onChange={onChange} /><EditableValue value={data.billedTo.gstin} onChange={(v) => onChange?.({...data, billedTo: {...data.billedTo, gstin: v}})} placeholder="GSTIN" /></p></DraggableBlock>}
               {data.billedTo.pan && <DraggableBlock id="billedTo_pan" data={data} onChange={onChange}><p style={{ margin: 0, color: '#444', fontSize: '0.9rem' }}><EditableLabel id="lbl_pan" defaultText="PAN: " data={data} onChange={onChange} /><EditableValue value={data.billedTo.pan} onChange={(v) => onChange?.({...data, billedTo: {...data.billedTo, pan: v}})} placeholder="PAN" /></p></DraggableBlock>}
             </div>
           </DraggableBlock>
@@ -223,7 +233,7 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
               </div>
               
               {data.items.map((item, index) => {
-                if (item.gstRate > 0) {
+                if (showGst && item.gstRate > 0) {
                   const igst = (item.quantity * item.rate) * (item.gstRate / 100);
                   return (
                     <div key={`tax-${index}`} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 16px', color: '#333', fontSize: '0.95rem' }}>
