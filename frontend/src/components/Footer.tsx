@@ -74,17 +74,9 @@ export const Footer: React.FC = () => {
 
         {/* Bottom bar */}
         <div className="border-t border-slate-800 pt-7 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-500 text-xs">
+          <p className="text-slate-500 text-xs text-center md:text-left w-full">
             © {new Date().getFullYear()} Durozen Technologies Private Limited. All rights reserved.
           </p>
-          <div className="flex items-center gap-2 text-xs text-slate-600">
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
-              All systems operational
-            </span>
-            <span className="text-slate-700">·</span>
-            <span>Made with ❤️ in Tamil Nadu, India</span>
-          </div>
         </div>
       </div>
     </footer>

@@ -122,7 +122,7 @@ export default function RootLayout({
         />
       </head>
       <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0 }} className="bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light">
           <Header />
           <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {children}
