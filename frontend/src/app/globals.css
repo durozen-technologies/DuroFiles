@@ -176,9 +176,9 @@ body {
 /* A4 Paper Styling for Preview */
 .a4-paper {
   background: white;
-  width: 210mm;
-  min-height: 297mm;
-  padding: 20mm;
+  width: 794px;
+  min-height: 1123px;
+  padding: 76px;
   box-sizing: border-box;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -627,49 +627,4 @@ body {
     width: 100vw;
   }
 
-  .a4-paper {
-    /* Retain A4 dimensions on mobile but allow horizontal scrolling */
-    min-width: 210mm !important;
-    width: 210mm !important;
-    padding: 20mm !important; 
-    margin: 0 auto !important;
-  }
-
-  .invoice-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-  }
-
-  .invoice-header {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .invoice-header>div:last-child {
-    text-align: left !important;
-  }
-
-  .invoice-meta-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .billed-sections {
-    flex-direction: column;
-  }
-
-  .invoice-bottom {
-    flex-direction: column;
-  }
-
-  .invoice-totals {
-    width: 100%;
-    margin-top: 24px;
-    margin-right: 0;
-  }
-
-  .invoice-table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
 }

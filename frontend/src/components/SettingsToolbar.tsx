@@ -62,10 +62,26 @@ export const SettingsToolbar: React.FC<Props> = ({ data, onChange }) => {
       element.style.setProperty('min-height', '0px', 'important');
       element.style.setProperty('height', 'max-content', 'important');
 
+      const scaleContainer = element.closest('.scale-to-fit-content') as HTMLElement;
+      const originalTransform = scaleContainer ? scaleContainer.style.transform : '';
+      if (scaleContainer) {
+        scaleContainer.style.transform = 'none';
+      }
+
       const html2canvas  = (await import('html2canvas')).default;
       const { jsPDF }    = await import('jspdf');
 
-      const canvas       = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+      const canvas       = await html2canvas(element, { 
+        scale: 2, 
+        useCORS: true, 
+        logging: false,
+        windowWidth: 794,
+        width: 794
+      });
+
+      if (scaleContainer) {
+        scaleContainer.style.transform = originalTransform;
+      }
       const imgData      = canvas.toDataURL('image/jpeg', 1.0);
       const pdf          = new jsPDF('p', 'mm', 'a4');
       const pdfWidth     = pdf.internal.pageSize.getWidth();
