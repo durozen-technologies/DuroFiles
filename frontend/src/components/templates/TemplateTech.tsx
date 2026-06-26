@@ -5,6 +5,8 @@ import { DraggableBlock } from '../DraggableBlock';
 import { EditableLabel } from '../EditableLabel';
 import { EditableValue } from '../EditableValue';
 import { EditableImage } from '../EditableImage';
+import { multiply, sum, calculateTax, add } from '../../utils/math';
+import { formatCurrency } from '../../utils/formatters';
 
 interface Props {
   data: InvoiceData;
@@ -15,19 +17,35 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
   const showGst = !data.hiddenFields?.includes('gst');
 
   const calculateTotal = () => {
-    return data.items.reduce((sum, item) => {
-      const amount = item.quantity * item.rate;
-      const igst = showGst ? amount * (item.gstRate / 100) : 0;
-      return sum + amount + igst;
-    }, 0);
+    const amounts = data.items.map(item => {
+      const amount = multiply(item.quantity, item.rate);
+      const igst = showGst ? calculateTax(amount, item.gstRate) : 0;
+      return add(amount, igst);
+    });
+    return sum(amounts);
   };
 
   const calculateSubTotal = () => {
-    return data.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
+    const amounts = data.items.map(item => multiply(item.quantity, item.rate));
+    return sum(amounts);
   };
 
   const grandTotal = calculateTotal();
-  const upiUri = `upi://pay?pa=${data.upiId}&pn=${encodeURIComponent(data.billedBy.name)}&am=${grandTotal.toFixed(2)}&cu=INR`;
+  const subTotal = calculateSubTotal();
+
+  const handleRowKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      if (onChange) {
+        onChange({
+          ...data,
+          items: [...data.items, { id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]
+        });
+      }
+    }
+  };
+
+  const upiUri = `upi://pay?pa=${data.upiId}&pn=${encodeURIComponent(data.billedBy.name)}&am=${formatCurrency(grandTotal, 'en-IN')}&cu=INR`;
 
   return (
     <div className="a4-paper template-tech" style={{ position: 'relative', paddingBottom: '40mm' }}>
@@ -151,7 +169,7 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
             </thead>
             <tbody>
               {data.items.map((item, index) => {
-                const amount = item.quantity * item.rate;
+                const amount = multiply(item.quantity, item.rate);
                 return (
                   <tr key={index} style={{ borderBottom: '1px solid #eaeaea' }}>
                     <td style={{ padding: '12px 16px', color: '#333', fontSize: '0.95rem' }}>
@@ -162,7 +180,7 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
                     </td>
                     <td style={{ padding: '12px 16px', textAlign: 'right', color: '#333', fontSize: '0.95rem' }}>{data.currency || '₹'}<EditableValue value={item.rate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = {...item, rate: parseFloat(v)||0}; onChange?.({...data, items: newItems})}} placeholder="0" /></td>
                     <td style={{ padding: '12px 16px', textAlign: 'center', color: '#333', fontSize: '0.95rem' }}><EditableValue value={item.quantity.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = {...item, quantity: parseFloat(v)||0}; onChange?.({...data, items: newItems})}} placeholder="0" /></td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', color: '#333', fontSize: '0.95rem' }}>{data.currency || '₹'}<EditableValue value={amount.toFixed(2)} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = {...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt}; onChange?.({...data, items: newItems})}} placeholder="0" /></td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', color: '#333', fontSize: '0.95rem' }}><span tabIndex={0} onKeyDown={handleRowKeyDown} style={{outline: 'none'}}>{data.currency || '₹'}<EditableValue value={amount.toString()} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = {...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt}; onChange?.({...data, items: newItems})}} placeholder="0" /></span></td>
                   </tr>
                 );
               })}
@@ -229,16 +247,17 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 16px', color: '#333', fontSize: '0.95rem' }}>
                 <DraggableBlock id="totals_subLabel" data={data} onChange={onChange}><span>Sub Total</span></DraggableBlock>
-                <DraggableBlock id="totals_subVal" data={data} onChange={onChange}><span>{data.currency || '₹'}{calculateSubTotal().toFixed(2)}</span></DraggableBlock>
+                <DraggableBlock id="totals_subVal" data={data} onChange={onChange}><span>{data.currency || '₹'}{formatCurrency(subTotal)}</span></DraggableBlock>
               </div>
               
               {data.items.map((item, index) => {
                 if (showGst && item.gstRate > 0) {
-                  const igst = (item.quantity * item.rate) * (item.gstRate / 100);
+                  const amount = multiply(item.quantity, item.rate);
+                  const igst = calculateTax(amount, item.gstRate);
                   return (
                     <div key={`tax-${index}`} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 16px', color: '#333', fontSize: '0.95rem' }}>
                       <DraggableBlock id={`totals_igstLabel_${index}`} data={data} onChange={onChange}><span>Tax (GST <EditableValue value={item.gstRate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = {...item, gstRate: parseFloat(v)||0}; onChange?.({...data, items: newItems})}} placeholder="0" />%)</span></DraggableBlock>
-                      <DraggableBlock id={`totals_igstVal_${index}`} data={data} onChange={onChange}><span>{data.currency || '₹'}{igst.toFixed(2)}</span></DraggableBlock>
+                      <DraggableBlock id={`totals_igstVal_${index}`} data={data} onChange={onChange}><span>{data.currency || '₹'}{formatCurrency(igst)}</span></DraggableBlock>
                     </div>
                   );
                 }
@@ -247,7 +266,7 @@ export const TemplateTech: React.FC<Props> = ({ data, onChange }) => {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px', backgroundColor: '#e2ccd8', marginTop: '8px', fontWeight: 700, color: '#111', fontSize: '1.1rem' }}>
                 <DraggableBlock id="totals_grandLabel" data={data} onChange={onChange}><span>Grand Total</span></DraggableBlock>
-                <DraggableBlock id="totals_grandVal" data={data} onChange={onChange}><span>{data.currency || '₹'}{calculateTotal().toFixed(2)}</span></DraggableBlock>
+                <DraggableBlock id="totals_grandVal" data={data} onChange={onChange}><span>{data.currency || '₹'}{formatCurrency(grandTotal)}</span></DraggableBlock>
               </div>
             </div>
           </DraggableBlock>

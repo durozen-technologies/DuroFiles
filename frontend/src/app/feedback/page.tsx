@@ -2,7 +2,17 @@
 
 import { useState } from 'react';
 import { Footer } from '../../components/Footer';
-import { MessageSquare, Star, Loader2, CheckCircle2 } from 'lucide-react';
+import { Star, Loader2, CheckCircle2, Sparkles, ThumbsUp } from 'lucide-react';
+
+const EMOJI_REACTIONS = [
+  { emoji: "😐", label: "Meh" },
+  { emoji: "🙂", label: "Okay" },
+  { emoji: "😊", label: "Good" },
+  { emoji: "😍", label: "Love it" },
+  { emoji: "🤩", label: "Amazing!" },
+];
+
+const RATING_LABELS = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'];
 
 export default function Feedback() {
   const [formData, setFormData] = useState({ name: '', email: '', feedback: '' });
@@ -11,6 +21,7 @@ export default function Feedback() {
   const [error, setError] = useState('');
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [selectedEmoji, setSelectedEmoji] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,17 +30,16 @@ export default function Feedback() {
 
     try {
       const SCRIPT_URL = process.env.NEXT_PUBLIC_FEEDBACK_SCRIPT_URL || '';
-
       await fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, rating }),
+        body: JSON.stringify({ ...formData, rating, reaction: selectedEmoji !== null ? EMOJI_REACTIONS[selectedEmoji].label : '' }),
       });
-
       setSuccess(true);
       setFormData({ name: '', email: '', feedback: '' });
       setRating(0);
+      setSelectedEmoji(null);
     } catch (err: any) {
       setError(err.message || 'Failed to send feedback. Please try again.');
     } finally {
@@ -37,139 +47,162 @@ export default function Feedback() {
     }
   };
 
+  const inputClass =
+    "w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm";
+
   return (
-    <div style={{ minHeight: '90vh', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+
       {/* Hero */}
-      <section style={{ padding: '80px 20px 60px 20px', textAlign: 'center', background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '3.5rem', fontWeight: 900, color: '#0f172a', marginBottom: '16px', letterSpacing: '-0.02em' }}>
+      <section className="relative px-6 py-16 md:py-20 text-center bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/3 w-80 h-80 bg-violet-100/50 dark:bg-violet-950/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-pink-100/40 dark:bg-pink-950/20 rounded-full blur-3xl" />
+        </div>
+        <div className="relative max-w-2xl mx-auto flex flex-col items-center">
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center mb-6 shadow-lg shadow-violet-500/25">
+            <Sparkles size={28} className="text-white" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white mb-4 leading-tight">
             Share Your Feedback
           </h1>
-          <p style={{ fontSize: '1.25rem', color: '#475569', lineHeight: 1.6 }}>
-            Help us improve DuroFiles !! Your feedback shapes what we build next.
+          <p className="text-base md:text-lg text-slate-500 dark:text-slate-400 max-w-lg leading-relaxed">
+            Help us improve DuroFiles! Your honest thoughts and feature requests shape what we build next.
           </p>
         </div>
       </section>
 
-      {/* Form Section */}
-      <section style={{ padding: '20px 20px 80px 20px', flex: 1, display: 'flex', justifyContent: 'center' }}>
-        <div style={{ maxWidth: '680px', width: '100%' }}>
-          <div style={{ background: 'white', padding: '48px', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-            <h3 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '8px', color: '#0f172a' }}>
-              Feedback Form
-            </h3>
-            <p style={{ color: '#64748b', marginBottom: '36px', fontSize: '0.95rem' }}>
-              About this application, tell us what you think!
-            </p>
+      {/* Form */}
+      <section className="px-6 py-16 flex-1 flex items-start justify-center">
+        <div className="w-full max-w-xl">
+          <div className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
 
             {success ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 20px', textAlign: 'center', background: '#ecfdf5', borderRadius: '16px', border: '1px solid #10b981' }}>
-                <CheckCircle2 size={56} color="#10b981" style={{ marginBottom: '16px' }} />
-                <h4 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#065f46', margin: '0 0 10px 0' }}>Thank You!</h4>
-                <p style={{ color: '#047857', margin: '0 0 24px 0', fontSize: '1rem' }}>
-                  Your feedback has been received. We really appreciate it! 🙌
+              <div className="flex flex-col items-center justify-center py-14 text-center">
+                <div className="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-6">
+                  <CheckCircle2 size={40} className="text-emerald-500" />
+                </div>
+                <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Thank You! 🎉</h4>
+                <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm max-w-xs leading-relaxed">
+                  Your feedback has been received. We truly appreciate your help in making DuroFiles better!
                 </p>
                 <button
                   onClick={() => setSuccess(false)}
-                  style={{ padding: '10px 24px', background: 'transparent', border: '1px solid #10b981', color: '#065f46', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+                  className="flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold hover:-translate-y-0.5 transition-all shadow-lg shadow-blue-500/20"
                 >
+                  <ThumbsUp size={16} />
                   Submit Another
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {error && (
-                  <div style={{ padding: '12px 16px', background: '#fef2f2', color: '#b91c1c', borderRadius: '10px', border: '1px solid #fecaca', fontSize: '0.9rem' }}>
-                    {error}
-                  </div>
-                )}
-
-                {/* Name */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '0.95rem', fontWeight: 600, color: '#475569' }}>
-                    Name <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Your full name"
-                    style={{ padding: '14px 16px', borderRadius: '12px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '1rem', backgroundColor: '#f8fafc', transition: 'border-color 0.2s' }}
-                    onFocus={e => e.target.style.borderColor = '#2563eb'}
-                    onBlur={e => e.target.style.borderColor = '#cbd5e1'}
-                  />
+              <>
+                <div className="mb-7">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Feedback Form</h2>
+                  <p className="text-slate-400 dark:text-slate-500 text-sm">Tell us what you think or suggest a feature.</p>
                 </div>
 
-                {/* Email */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '0.95rem', fontWeight: 600, color: '#475569' }}>
-                    Email <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    required
-                    type="email"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="you@example.com"
-                    style={{ padding: '14px 16px', borderRadius: '12px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '1rem', backgroundColor: '#f8fafc', transition: 'border-color 0.2s' }}
-                    onFocus={e => e.target.style.borderColor = '#2563eb'}
-                    onBlur={e => e.target.style.borderColor = '#cbd5e1'}
-                  />
-                </div>
-
-                {/* Star Rating */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <label style={{ fontSize: '0.95rem', fontWeight: 600, color: '#475569' }}>
-                    Rate your experience
-                  </label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    {[1, 2, 3, 4, 5].map(star => (
-                      <Star
-                        key={star}
-                        size={36}
-                        style={{ cursor: 'pointer', transition: 'transform 0.15s' }}
-                        fill={(hoverRating || rating) >= star ? '#f59e0b' : 'none'}
-                        color={(hoverRating || rating) >= star ? '#f59e0b' : '#cbd5e1'}
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => setRating(star)}
-                      />
-                    ))}
-                  </div>
-                  {rating > 0 && (
-                    <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                      {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'][rating]} — {rating}/5 stars
-                    </span>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                  {error && (
+                    <div className="p-4 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-xl border border-red-500/20 text-sm">
+                      {error}
+                    </div>
                   )}
-                </div>
 
-                {/* Feedback */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '0.95rem', fontWeight: 600, color: '#475569' }}>
-                    Feedback <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <textarea
-                    required
-                    value={formData.feedback}
-                    onChange={e => setFormData({ ...formData, feedback: e.target.value })}
-                    placeholder="Share your thoughts, suggestions, or report any issues with DuroFiles..."
-                    rows={6}
-                    style={{ padding: '14px 16px', borderRadius: '12px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '1rem', resize: 'vertical', backgroundColor: '#f8fafc', fontFamily: 'inherit', lineHeight: 1.6 }}
-                    onFocus={e => e.target.style.borderColor = '#2563eb'}
-                    onBlur={e => e.target.style.borderColor = '#cbd5e1'}
-                  />
-                </div>
+                  {/* Quick Emoji Reaction */}
+                  <div className="flex flex-col gap-2.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      How do you feel about DuroFiles?
+                    </label>
+                    <div className="flex gap-3 flex-wrap">
+                      {EMOJI_REACTIONS.map((item, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setSelectedEmoji(selectedEmoji === idx ? null : idx)}
+                          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-2xl border-2 transition-all duration-200 cursor-pointer ${
+                            selectedEmoji === idx
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 scale-110'
+                              : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 hover:scale-105'
+                          }`}
+                        >
+                          <span className="text-2xl leading-none">{item.emoji}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                {/* Submit */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{ padding: '18px', borderRadius: '12px', background: 'var(--primary-color, #2563eb)', color: 'white', fontWeight: 700, fontSize: '1.1rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', marginTop: '8px', boxShadow: '0 10px 25px -5px rgba(37,99,235,0.4)', transition: 'transform 0.2s, box-shadow 0.2s', opacity: loading ? 0.7 : 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
-                >
-                  {loading ? <><Loader2 size={22} className="animate-spin" /> Sending...</> : '🚀 Submit Feedback'}
-                </button>
-              </form>
+                  {/* Star Rating */}
+                  <div className="flex flex-col gap-2.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      Rate your experience
+                    </label>
+                    <div className="flex gap-2 items-center">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <Star
+                          key={star}
+                          size={34}
+                          className="cursor-pointer transition-all duration-150 hover:scale-110 active:scale-95"
+                          fill={(hoverRating || rating) >= star ? '#f59e0b' : 'none'}
+                          color={(hoverRating || rating) >= star ? '#f59e0b' : '#cbd5e1'}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          onClick={() => setRating(star)}
+                        />
+                      ))}
+                      {rating > 0 && (
+                        <span className="text-sm font-semibold text-amber-600 dark:text-amber-400 ml-2">
+                          {RATING_LABELS[rating]} ({rating}/5)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        required type="text" value={formData.name}
+                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Your full name" className={inputClass}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Email <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        required type="email" value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="you@example.com" className={inputClass}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      Feedback <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      required value={formData.feedback}
+                      onChange={e => setFormData({ ...formData, feedback: e.target.value })}
+                      placeholder="Share your thoughts, suggestions, or report any issues..."
+                      rows={5}
+                      className={`${inputClass} resize-none`}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold shadow-lg shadow-blue-500/20 disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                  >
+                    {loading ? <><Loader2 size={18} className="animate-spin" /> Sending...</> : 'Submit Feedback'}
+                  </button>
+                </form>
+              </>
             )}
           </div>
         </div>

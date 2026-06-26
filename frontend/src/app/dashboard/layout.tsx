@@ -5,11 +5,13 @@ import { useRouter, usePathname } from 'next/navigation';
 import { LayoutDashboard, FileText, Users, Package, Settings, Trash2, Plus } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
+import { saveInvoice } from '../../utils/storage';
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleCreateNew = () => {
+  const handleCreateNew = async () => {
     const newInvoice = {
       id: uuidv4(),
       templateId: 'modern' as const,
@@ -23,10 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       items: [{ id: uuidv4(), description: 'Sample Item', hsn: '', gstRate: 18, quantity: 1, rate: 1000 }],
       paymentDetails: { upiId: '' }
     };
-    const saved = localStorage.getItem('invoices_db');
-    const invoices = saved ? JSON.parse(saved) : [];
-    invoices.push(newInvoice);
-    localStorage.setItem('invoices_db', JSON.stringify(invoices));
+    await saveInvoice(newInvoice as any);
     router.push(`/invoice/${newInvoice.id}`);
   };
 

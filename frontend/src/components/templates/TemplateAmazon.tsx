@@ -6,6 +6,8 @@ import { EditableLabel } from '../EditableLabel';
 import { EditableValue } from '../EditableValue';
 import { EditableImage } from '../EditableImage';
 import { numberToWords } from '../../utils/numberToWords';
+import { multiply, sum, calculateTax, add, divide } from '../../utils/math';
+import { formatCurrency } from '../../utils/formatters';
 
 interface Props {
   data: InvoiceData;
@@ -16,24 +18,38 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
   const isIGST = data.taxSettings?.type === 'IGST';
 
   const calculateSubtotal = () => {
-    return data.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
+    const amounts = data.items.map(item => multiply(item.quantity, item.rate));
+    return sum(amounts);
   };
 
   const showGst = !data.hiddenFields?.includes('gst');
 
   const calculateTotalIGST = () => {
     if (!showGst) return 0;
-    return data.items.reduce((sum, item) => {
-      const amount = item.quantity * item.rate;
-      return sum + (amount * ((item.gstRate || 0) / 100));
-    }, 0);
+    const taxes = data.items.map(item => {
+      const amount = multiply(item.quantity, item.rate);
+      return calculateTax(amount, item.gstRate || 0);
+    });
+    return sum(taxes);
   };
 
   const subtotal = calculateSubtotal();
   const totalTax = calculateTotalIGST();
-  const grandTotal = subtotal + totalTax;
+  const grandTotal = add(subtotal, totalTax);
 
-  const upiUri = `upi://pay?pa=$<EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" />&pn=${encodeURIComponent(data.billedBy.name)}&am=${grandTotal.toFixed(2)}&cu=INR`;
+  const handleRowKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      if (onChange) {
+        onChange({
+          ...data,
+          items: [...data.items, { id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]
+        });
+      }
+    }
+  };
+
+  const upiUri = `upi://pay?pa=$<EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" />&pn=${encodeURIComponent(data.billedBy.name)}&am=${formatCurrency(grandTotal, 'en-IN')}&cu=INR`;
 
   const totalItems = data.items.length;
   const totalQty = data.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -151,9 +167,9 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
               </tr>
             )}
             {data.items.map((item, index) => {
-              const amount = item.quantity * item.rate;
-              const taxAmount = amount * ((item.gstRate || 0) / 100);
-              const total = amount + taxAmount;
+              const amount = multiply(item.quantity, item.rate);
+              const taxAmount = calculateTax(amount, item.gstRate || 0);
+              const total = add(amount, taxAmount);
 
               return (
                 <tr key={item.id || index} className="invoice-row-group" style={{ position: "relative" }}>
@@ -171,9 +187,9 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
                   </td>
                   <td style={{ padding: '8px', textAlign: 'right', verticalAlign: 'top' }}><EditableValue value={item.rate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, rate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
                   <td style={{ padding: '8px', textAlign: 'right', verticalAlign: 'top' }}><EditableValue value={item.quantity.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, quantity: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
-                  {showGst && <td style={{ padding: '8px', textAlign: 'right', verticalAlign: 'top' }}><EditableValue value={amount.toFixed(2)} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>}
-                  {showGst && <td style={{ padding: '8px', textAlign: 'right', verticalAlign: 'top' }}>{taxAmount.toFixed(2)} (<EditableValue value={item.gstRate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, gstRate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" />%)</td>}
-                  <td style={{ padding: '8px', textAlign: 'right', verticalAlign: 'top' }}><EditableValue value={total.toFixed(2)} onChange={(v) => { const newItems = [...data.items]; const newTotal = parseFloat(v) || 0; const newAmt = newTotal / (1 + (item.gstRate || 0) / 100); newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
+                  {showGst && <td style={{ padding: '8px', textAlign: 'right', verticalAlign: 'top' }}><EditableValue value={amount.toString()} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>}
+                  {showGst && <td style={{ padding: '8px', textAlign: 'right', verticalAlign: 'top' }}>{formatCurrency(taxAmount)} (<EditableValue value={item.gstRate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, gstRate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" />%)</td>}
+                  <td style={{ padding: '8px', textAlign: 'right', verticalAlign: 'top' }}><span tabIndex={0} onKeyDown={handleRowKeyDown} style={{outline: 'none'}}><EditableValue value={total.toString()} onChange={(v) => { const newItems = [...data.items]; const newTotal = parseFloat(v) || 0; const newAmt = newTotal / (1 + (item.gstRate || 0) / 100); newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></span></td>
                 </tr>
               );
             })}
@@ -201,30 +217,30 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
             <tbody>
               <tr>
                 <td style={{ padding: '3px 8px', textAlign: 'left' }}><strong>Amount</strong></td>
-                <td style={{ padding: '3px 8px', textAlign: 'right' }}><strong>{data.currency || '₹'}{subtotal.toFixed(2)}</strong></td>
+                <td style={{ padding: '3px 8px', textAlign: 'right' }}><strong>{data.currency || '₹'}{formatCurrency(subtotal)}</strong></td>
               </tr>
               {showGst && (
                 isIGST ? (
                   <tr>
                     <td style={{ padding: '3px 8px', textAlign: 'left' }}><strong>IGST</strong></td>
-                    <td style={{ padding: '3px 8px', textAlign: 'right' }}><strong>{data.currency || '₹'}{totalTax.toFixed(2)}</strong></td>
+                    <td style={{ padding: '3px 8px', textAlign: 'right' }}><strong>{data.currency || '₹'}{formatCurrency(totalTax)}</strong></td>
                   </tr>
                 ) : (
                   <>
                     <tr>
                       <td style={{ padding: '3px 8px', textAlign: 'left' }}><strong>SGST</strong></td>
-                      <td style={{ padding: '3px 8px', textAlign: 'right' }}><strong>{data.currency || '₹'}{(totalTax / 2).toFixed(2)}</strong></td>
+                      <td style={{ padding: '3px 8px', textAlign: 'right' }}><strong>{data.currency || '₹'}{formatCurrency(divide(totalTax, 2))}</strong></td>
                     </tr>
                     <tr>
                       <td style={{ padding: '3px 8px', textAlign: 'left' }}><strong>CGST</strong></td>
-                      <td style={{ padding: '3px 8px', textAlign: 'right' }}><strong>{data.currency || '₹'}{(totalTax / 2).toFixed(2)}</strong></td>
+                      <td style={{ padding: '3px 8px', textAlign: 'right' }}><strong>{data.currency || '₹'}{formatCurrency(divide(totalTax, 2))}</strong></td>
                     </tr>
                   </>
                 )
               )}
               <tr>
                 <td style={{ padding: '3px 8px', textAlign: 'left', fontWeight: 'bold', fontSize: '14px' }}>Total</td>
-                <td style={{ padding: '3px 8px', textAlign: 'right', fontWeight: 'bold', fontSize: '14px' }}>{data.currency || '₹'}{grandTotal.toFixed(2)}</td>
+                <td style={{ padding: '3px 8px', textAlign: 'right', fontWeight: 'bold', fontSize: '14px' }}>{data.currency || '₹'}{formatCurrency(grandTotal)}</td>
               </tr>
 
             </tbody>
@@ -242,7 +258,7 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
 
       <DraggableBlock id="amazon_amount_payable" data={data} onChange={onChange}>
         <div style={{ textAlign: 'right', fontWeight: 'bold', marginBottom: '30px' }}>
-          Amount Payable: {data.currency || '₹'}{grandTotal.toFixed(2)}
+          Amount Payable: {data.currency || '₹'}{formatCurrency(grandTotal)}
         </div>
       </DraggableBlock>
 
@@ -293,12 +309,15 @@ export const TemplateAmazon: React.FC<Props> = ({ data, onChange }) => {
               )}
               {onChange && (
                 <label style={{ position: 'absolute', inset: 0, cursor: 'pointer', display: 'block' }} title="Upload stamp / signature image">
-                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => onChange({ ...data, signatureUrl: ev.target?.result as string });
-                    reader.readAsDataURL(file);
+                    try {
+                      const compressed = await compressImage(file);
+                      onChange({ ...data, signatureUrl: compressed });
+                    } catch(err) {
+                      console.error("Signature compression failed", err);
+                    }
                   }} />
                 </label>
               )}

@@ -10,8 +10,12 @@ export default function DashboardOverview() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setInvoices(getAllInvoices());
     setIsMounted(true);
+    const loadInvoices = async () => {
+      const data = await getAllInvoices();
+      setInvoices(data);
+    };
+    loadInvoices();
   }, []);
 
   if (!isMounted) return null;

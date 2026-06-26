@@ -20,3 +20,7 @@ The primary output of this application is a PDF.
 ## 4. File Structure
 - **Rule:** All reusable UI pieces should go in `src/components/`.
 - **Rule:** All type definitions must go in `src/types/`. Do not declare types inline inside component files unless they are component props.
+
+## 5. Version Control
+- **Rule:** DO NOT initiate any Git commands (such as `git commit`, `git push`, `git rm`, `git reset`) automatically.
+- **Rule:** Always request explicit permission and await confirmation from the user BEFORE executing any version control operations.

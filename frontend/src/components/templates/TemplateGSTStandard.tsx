@@ -5,6 +5,8 @@ import { DraggableBlock } from '../DraggableBlock';
 import { EditableLabel } from '../EditableLabel';
 import { EditableValue } from '../EditableValue';
 import { EditableImage } from '../EditableImage';
+import { multiply, sum, calculateTax, add, divide } from '../../utils/math';
+import { formatCurrency } from '../../utils/formatters';
 
 interface Props {
   data: InvoiceData;
@@ -15,17 +17,19 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
   const isIGST = data.taxSettings?.type === 'IGST';
 
   const calculateSubtotal = () => {
-    return data.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
+    const amounts = data.items.map(item => multiply(item.quantity, item.rate));
+    return sum(amounts);
   };
 
   const showGst = !data.hiddenFields?.includes('gst');
 
   const calculateTotalIGST = () => {
     if (!showGst) return 0;
-    return data.items.reduce((sum, item) => {
-      const amount = item.quantity * item.rate;
-      return sum + (amount * ((item.gstRate || 0) / 100));
-    }, 0);
+    const taxes = data.items.map(item => {
+      const amount = multiply(item.quantity, item.rate);
+      return calculateTax(amount, item.gstRate || 0);
+    });
+    return sum(taxes);
   };
 
   const getColSpan = () => {
@@ -39,10 +43,23 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
 
   const subtotal = calculateSubtotal();
   const totalTax = calculateTotalIGST();
-  const grandTotal = subtotal + totalTax;
+  const grandTotal = add(subtotal, totalTax);
 
   const cgstSgstRateStr = (rate: number) => `${rate / 2}%`;
-  const upiUri = `upi://pay?pa=${data.upiId}&pn=${encodeURIComponent(data.billedBy.name)}&am=${grandTotal.toFixed(2)}&cu=INR`;
+
+  const handleRowKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      if (onChange) {
+        onChange({
+          ...data,
+          items: [...data.items, { id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]
+        });
+      }
+    }
+  };
+
+  const upiUri = `upi://pay?pa=${data.upiId}&pn=${encodeURIComponent(data.billedBy.name)}&am=${formatCurrency(grandTotal, 'en-IN')}&cu=INR`;
 
   return (
     <div className="a4-paper template-gst-standard" style={{ fontFamily: 'Arial, sans-serif', color: '#333' }}>
@@ -152,8 +169,9 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
               </tr>
             )}
             {data.items.map((item, index) => {
-              const amount = item.quantity * item.rate;
-              const taxAmount = amount * ((item.gstRate || 0) / 100);
+              const amount = multiply(item.quantity, item.rate);
+              const taxAmount = calculateTax(amount, item.gstRate || 0);
+              const halfTax = divide(taxAmount, 2);
 
               return (
                 <tr key={item.id || index} style={{ borderBottom: '1px solid #eee', fontSize: '0.8rem' }} className="invoice-row-group">
@@ -174,24 +192,24 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
 
                   {showGst && (isIGST ? (
                     <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>
-                      {taxAmount.toFixed(2)}<br />
+                      {formatCurrency(taxAmount)}<br />
                       <span style={{ fontSize: '0.7rem', color: '#777' }}><EditableValue value={item.gstRate.toString()} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, gstRate: parseFloat(v) || 0 }; onChange?.({ ...data, items: newItems }) }} placeholder="0" />%</span>
                     </td>
                   ) : (
                     <>
                       <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>
-                        {(taxAmount / 2).toFixed(2)}<br />
+                        {formatCurrency(halfTax)}<br />
                         <span style={{ fontSize: '0.7rem', color: '#777' }}>{cgstSgstRateStr(item.gstRate)}</span>
                       </td>
                       <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>
-                        {(taxAmount / 2).toFixed(2)}<br />
+                        {formatCurrency(halfTax)}<br />
                         <span style={{ fontSize: '0.7rem', color: '#777' }}>{cgstSgstRateStr(item.gstRate)}</span>
                       </td>
                     </>
                   ))}
 
                   {showGst && <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}>0.00</td>}
-                  <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}><EditableValue value={amount.toFixed(2)} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
+                  <td style={{ padding: '12px 10px', textAlign: 'right', verticalAlign: 'top' }}><span tabIndex={0} onKeyDown={handleRowKeyDown} style={{outline: 'none'}}><EditableValue value={amount.toString()} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></span></td>
                 </tr>
               );
             })}
@@ -248,24 +266,24 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
           <div style={{ width: '300px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.85rem' }}>
               <span style={{ color: '#555' }}>Sub Total</span>
-              <strong style={{ minWidth: '100px', textAlign: 'right' }}>{subtotal.toFixed(2)}</strong>
+              <strong style={{ minWidth: '100px', textAlign: 'right' }}>{formatCurrency(subtotal)}</strong>
             </div>
 
             {showGst && (
               isIGST ? (
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.85rem' }}>
                   <span style={{ color: '#555' }}>IGST</span>
-                  <strong style={{ minWidth: '100px', textAlign: 'right' }}>{totalTax.toFixed(2)}</strong>
+                  <strong style={{ minWidth: '100px', textAlign: 'right' }}>{formatCurrency(totalTax)}</strong>
                 </div>
               ) : (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.85rem' }}>
                     <span style={{ color: '#555' }}>SGST</span>
-                    <strong style={{ minWidth: '100px', textAlign: 'right' }}>{(totalTax / 2).toFixed(2)}</strong>
+                    <strong style={{ minWidth: '100px', textAlign: 'right' }}>{formatCurrency(divide(totalTax, 2))}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.85rem' }}>
                     <span style={{ color: '#555' }}>CGST</span>
-                    <strong style={{ minWidth: '100px', textAlign: 'right' }}>{(totalTax / 2).toFixed(2)}</strong>
+                    <strong style={{ minWidth: '100px', textAlign: 'right' }}>{formatCurrency(divide(totalTax, 2))}</strong>
                   </div>
                 </>
               )
@@ -273,7 +291,7 @@ export const TemplateGSTStandard: React.FC<Props> = ({ data, onChange }) => {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', fontSize: '0.95rem', borderTop: '1px solid #ddd', borderBottom: '1px solid #ddd', marginTop: '10px' }}>
               <strong>TOTAL</strong>
-              <strong style={{ minWidth: '100px', textAlign: 'right' }}>{data.currency === '₹' ? 'INR - Rs.' : data.currency} {grandTotal.toFixed(2)}</strong>
+              <strong style={{ minWidth: '100px', textAlign: 'right' }}>{data.currency === '₹' ? 'INR - Rs.' : data.currency} {formatCurrency(grandTotal)}</strong>
             </div>
           </div>
         </DraggableBlock>

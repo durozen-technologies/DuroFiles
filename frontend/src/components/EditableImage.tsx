@@ -8,6 +8,8 @@ interface Props {
   fallbackText?: string;
 }
 
+import { compressImage } from '../utils/imageCompression';
+
 export const EditableImage: React.FC<Props> = ({ src, onChange, className, style, fallbackText = "Upload Logo" }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -15,14 +17,15 @@ export const EditableImage: React.FC<Props> = ({ src, onChange, className, style
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onChange(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedBase64 = await compressImage(file);
+        onChange(compressedBase64);
+      } catch (error) {
+        console.error('Image compression failed', error);
+      }
     }
   };
 

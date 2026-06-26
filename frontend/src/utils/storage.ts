@@ -1,27 +1,26 @@
 import type { InvoiceData } from '../types/invoice';
+import localforage from 'localforage';
 
 const STORAGE_KEY = 'invoices_db';
 
-
-export const getAllInvoices = (): InvoiceData[] => {
+export const getAllInvoices = async (): Promise<InvoiceData[]> => {
   if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) return [];
   try {
-    return JSON.parse(data);
+    const data = await localforage.getItem<InvoiceData[]>(STORAGE_KEY);
+    return data || [];
   } catch (e) {
     return [];
   }
 };
 
-export const getInvoice = (id: string): InvoiceData | undefined => {
-  const invoices = getAllInvoices();
+export const getInvoice = async (id: string): Promise<InvoiceData | undefined> => {
+  const invoices = await getAllInvoices();
   return invoices.find(inv => inv.id === id);
 };
 
-export const saveInvoice = (invoice: InvoiceData): void => {
+export const saveInvoice = async (invoice: InvoiceData): Promise<void> => {
   if (typeof window === 'undefined') return;
-  const invoices = getAllInvoices();
+  const invoices = await getAllInvoices();
   const index = invoices.findIndex(inv => inv.id === invoice.id);
   
   if (index >= 0) {
@@ -30,12 +29,12 @@ export const saveInvoice = (invoice: InvoiceData): void => {
     invoices.push(invoice);
   }
   
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(invoices));
+  await localforage.setItem(STORAGE_KEY, invoices);
 };
 
-export const deleteInvoice = (id: string): void => {
+export const deleteInvoice = async (id: string): Promise<void> => {
   if (typeof window === 'undefined') return;
-  const invoices = getAllInvoices();
+  const invoices = await getAllInvoices();
   const filtered = invoices.filter(inv => inv.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  await localforage.setItem(STORAGE_KEY, filtered);
 };

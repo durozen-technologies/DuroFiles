@@ -6,6 +6,8 @@ import { EditableLabel } from '../EditableLabel';
 import { EditableValue } from '../EditableValue';
 import { EditableImage } from '../EditableImage';
 import { numberToWords } from '../../utils/numberToWords';
+import { multiply, sum, calculateTax, add, divide } from '../../utils/math';
+import { formatCurrency } from '../../utils/formatters';
 
 interface Props {
   data: InvoiceData;
@@ -16,24 +18,38 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
   const isIGST = data.taxSettings?.type === 'IGST';
 
   const calculateSubtotal = () => {
-    return data.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
+    const amounts = data.items.map(item => multiply(item.quantity, item.rate));
+    return sum(amounts);
   };
 
   const showGst = !data.hiddenFields?.includes('gst');
 
   const calculateTotalIGST = () => {
     if (!showGst) return 0;
-    return data.items.reduce((sum, item) => {
-      const amount = item.quantity * item.rate;
-      return sum + (amount * ((item.gstRate || 0) / 100));
-    }, 0);
+    const taxes = data.items.map(item => {
+      const amount = multiply(item.quantity, item.rate);
+      return calculateTax(amount, item.gstRate || 0);
+    });
+    return sum(taxes);
   };
 
   const subtotal = calculateSubtotal();
   const totalTax = calculateTotalIGST();
-  const grandTotal = subtotal + totalTax;
+  const grandTotal = add(subtotal, totalTax);
 
-  const upiUri = `upi://pay?pa=$<EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" />&pn=${encodeURIComponent(data.billedBy.name)}&am=${grandTotal.toFixed(2)}&cu=INR`;
+  const handleRowKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      if (onChange) {
+        onChange({
+          ...data,
+          items: [...data.items, { id: Math.random().toString(), description: '', hsn: '', gstRate: 18, quantity: 1, rate: 0 }]
+        });
+      }
+    }
+  };
+
+  const upiUri = `upi://pay?pa=$<EditableValue value={data.upiId} onChange={(v) => onChange?.({...data, upiId: v})} placeholder="example@upi" />&pn=${encodeURIComponent(data.billedBy.name)}&am=${formatCurrency(grandTotal, 'en-IN')}&cu=INR`;
 
   const totalItems = data.items.length;
   const totalQty = data.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -157,7 +173,7 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
               </tr>
             )}
             {data.items.map((item, index) => {
-              const amount = item.quantity * item.rate;
+              const amount = multiply(item.quantity, item.rate);
               return (
                 <tr key={item.id || index} className="invoice-row-group" style={{ position: "relative" }}>
                   <td style={{ padding: '8px', verticalAlign: 'top', borderBottom: '1px solid #eee', textAlign: 'left' }}>
@@ -175,7 +191,7 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
                     )}
                   </td>
                   <td style={{ padding: '8px', verticalAlign: 'top', borderBottom: '1px solid #eee', textAlign: 'right' }}><EditableValue value={item.hsn} onChange={(v) => { const newItems = [...data.items]; newItems[index] = { ...item, hsn: v }; onChange?.({ ...data, items: newItems }) }} placeholder="-" /></td>
-                  <td style={{ padding: '8px', verticalAlign: 'top', borderBottom: '1px solid #eee', textAlign: 'right' }}><EditableValue value={amount.toFixed(2)} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></td>
+                  <td style={{ padding: '8px', verticalAlign: 'top', borderBottom: '1px solid #eee', textAlign: 'right' }}><span tabIndex={0} onKeyDown={handleRowKeyDown} style={{outline: 'none'}}><EditableValue value={amount.toString()} onChange={(v) => { const newItems = [...data.items]; const newAmt = parseFloat(v) || 0; newItems[index] = { ...item, rate: item.quantity > 0 ? newAmt / item.quantity : newAmt }; onChange?.({ ...data, items: newItems }) }} placeholder="0" /></span></td>
                 </tr>
               );
             })}
@@ -202,23 +218,23 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
             <tbody>
               <tr>
                 <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>Amount</td>
-                <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{subtotal.toFixed(2)}</td>
+                <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{formatCurrency(subtotal)}</td>
               </tr>
               {showGst && (
                 isIGST ? (
                   <tr>
                     <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>IGST</td>
-                    <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{totalTax.toFixed(2)}</td>
+                    <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{formatCurrency(totalTax)}</td>
                   </tr>
                 ) : (
                   <>
                     <tr>
                       <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>CGST</td>
-                      <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{(totalTax / 2).toFixed(2)}</td>
+                      <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{formatCurrency(divide(totalTax, 2))}</td>
                     </tr>
                     <tr>
                       <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold' }}>SGST</td>
-                      <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{(totalTax / 2).toFixed(2)}</td>
+                      <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right' }}>{data.currency || '₹'}{formatCurrency(divide(totalTax, 2))}</td>
                     </tr>
                   </>
                 )
@@ -229,7 +245,7 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
               </tr>
               <tr>
                 <td style={{ padding: '3px 8px', border: 'none', color: '#000', fontWeight: 'bold', fontSize: '14px', borderTop: '1px solid #ccc' }}>Total</td>
-                <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right', fontWeight: 'bold', fontSize: '14px', borderTop: '1px solid #ccc' }}>{data.currency || '₹'}{grandTotal.toFixed(2)}</td>
+                <td style={{ padding: '3px 8px', border: 'none', color: '#000', textAlign: 'right', fontWeight: 'bold', fontSize: '14px', borderTop: '1px solid #ccc' }}>{data.currency || '₹'}{formatCurrency(grandTotal)}</td>
               </tr>
 
             </tbody>
@@ -248,7 +264,7 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
       {/* Payment Summary */}
       <DraggableBlock id="ig_payment_summary" data={data} onChange={onChange}>
         <div style={{ textAlign: 'right', marginBottom: '30px', lineHeight: 1.6 }}>
-          <div style={{ fontWeight: 'bold' }}>Amount Payable: &nbsp;&nbsp;&nbsp; {data.currency || '₹'} {grandTotal.toFixed(2)}</div>
+          <div style={{ fontWeight: 'bold' }}>Amount Payable: &nbsp;&nbsp;&nbsp; {data.currency || '₹'} {formatCurrency(grandTotal)}</div>
         </div>
       </DraggableBlock>
 
@@ -300,12 +316,15 @@ export const TemplateInstagram: React.FC<Props> = ({ data, onChange }) => {
                 )}
                 {onChange && (
                   <label style={{ position: 'absolute', inset: 0, cursor: 'pointer', display: 'block' }} title="Upload stamp / signature image">
-                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = (ev) => onChange({ ...data, signatureUrl: ev.target?.result as string });
-                      reader.readAsDataURL(file);
+                      try {
+                        const compressed = await compressImage(file);
+                        onChange({ ...data, signatureUrl: compressed });
+                      } catch(err) {
+                        console.error("Signature compression failed", err);
+                      }
                     }} />
                   </label>
                 )}

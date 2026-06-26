@@ -25,7 +25,8 @@ export const metadata: Metadata = {
   description:
     'Create, customise, and download beautiful PDF invoices in seconds. No sign-up required. GST-ready templates for freelancers and businesses.',
   keywords: [
-    'invoice generator', 'free invoice maker', 'pdf invoice', 'business invoice',
+    'Free Invoice Generator', 'Invoice Generator', 'Invoice Maker', 'PDF Invoice Generator', 'GST Invoice Generator',
+    'free invoice maker', 'pdf invoice', 'business invoice',
     'billing software', 'gst invoice', 'receipt maker', 'durofiles',
   ],
   authors: [{ name: 'Durozen Technologies', url: 'https://durozen.in' }],
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     description:
       'Create, customise, and download beautiful PDF invoices in seconds. No sign-up required.',
     url: 'https://durofiles.durozen.in',
-    siteName: 'DuroFiles',
+    siteName: 'DuroFiles - Free Invoice Generator',
     images: [
       {
         url: '/og-image.png',
@@ -94,9 +95,11 @@ export const metadata: Metadata = {
   },
 
   // ── App info ─────────────────────────────────────────────────────────────────
-  applicationName: 'DuroFiles',
+  applicationName: 'DuroFiles - Free Invoice Generator',
   category: 'business',
 };
+
+import { ThemeProvider } from "../components/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -104,12 +107,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0 }}>
-        <Header />
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {children}
-        </main>
+    <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "DuroFiles - Free Invoice Generator",
+              "url": "https://durofiles.durozen.in"
+            })
+          }}
+        />
+      </head>
+      <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0 }} className="bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Header />
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {children}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );

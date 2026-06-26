@@ -3,12 +3,13 @@ import React, { useState, useEffect } from 'react';
 interface Props {
   value: string;
   onChange: (newValue: string) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void;
   className?: string;
   placeholder?: string;
   isTextArea?: boolean;
 }
 
-export const EditableValue: React.FC<Props> = ({ value, onChange, className, placeholder, isTextArea }) => {
+export const EditableValue: React.FC<Props> = ({ value, onChange, onKeyDown, className, placeholder, isTextArea }) => {
   const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
@@ -22,6 +23,10 @@ export const EditableValue: React.FC<Props> = ({ value, onChange, className, pla
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (onKeyDown) onKeyDown(e);
+  };
+
   return (
     <span
       contentEditable={true}
@@ -29,6 +34,7 @@ export const EditableValue: React.FC<Props> = ({ value, onChange, className, pla
       onBlur={handleBlur}
       onInput={(e) => setLocalValue(e.currentTarget.textContent || '')}
       onMouseDown={(e) => e.stopPropagation()}
+      onKeyDown={handleKeyDown}
       className={`editable-field ${className || ''}`}
       style={{
         cursor: 'text',

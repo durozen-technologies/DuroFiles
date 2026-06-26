@@ -14,10 +14,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     setIsMounted(true);
-    setInvoices(getAllInvoices());
+    const loadInvoices = async () => {
+      const data = await getAllInvoices();
+      setInvoices(data);
+    };
+    loadInvoices();
   }, []);
 
-  const handleCreateNew = () => {
+  const handleCreateNew = async () => {
     const newId = uuidv4();
     const newInvoice: InvoiceData = {
       id: newId,
@@ -41,17 +45,18 @@ export default function Dashboard() {
       ],
       paymentDetails: { upiId: 'merchant@upi' }
     };
-    saveInvoice(newInvoice);
-    router.push(`/invoice/${newId}`);
-  };
-
-  const handleDelete = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (confirm('Are you sure you want to delete this invoice?')) {
-      deleteInvoice(id);
-      setInvoices(getAllInvoices());
-    }
-  };
+      await saveInvoice(newInvoice);
+      router.push(`/invoice/${newId}`);
+    };
+  
+    const handleDelete = async (id: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (confirm('Are you sure you want to delete this invoice?')) {
+        await deleteInvoice(id);
+        const data = await getAllInvoices();
+        setInvoices(data);
+      }
+    };
 
   if (!isMounted) return null;
 
